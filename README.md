@@ -1,11 +1,6 @@
 # OneUI QuickPanel Customizer (DIY OneUI)
 
-A specialized tool designed to create perfectly aligned wallpapers and custom theme templates for Samsung's OneUI QuickPanel layout. 
-
-> [!NOTE]  
-> This project was built for **personal use** to accommodate customization preferences following a new OneUI update. 
-
-🤖 **Built with AI / Vibecoded:** This entire application was developed, iterated, and deployed using agentic AI pairing (vibecoding).
+A specialized tool designed to create perfectly aligned wallpapers and custom theme templates for Samsung's OneUI QuickPanel layout. This project was built for personal use to accommodate customization preferences following a new OneUI update, and was vibecoded in a collaborative pair-programming partnership with an AI coding assistant.
 
 ---
 
