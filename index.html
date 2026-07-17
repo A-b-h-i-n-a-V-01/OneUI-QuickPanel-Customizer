@@ -5,6 +5,12 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>diy-oneui</title>
+    <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        alert("Error: " + message + "\nSource: " + source + "\nLine: " + lineno + "\nStack: " + (error ? error.stack : 'none'));
+        return false;
+      };
+    </script>
     <!-- Google Fonts: Plus Jakarta Sans for Samsung Aesthetics -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

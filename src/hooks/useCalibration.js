@@ -120,7 +120,11 @@ export function useCalibration() {
   }, []);
 
   const hasSavedCalibration = useCallback(() => {
-    return localStorage.getItem(STORAGE_KEY) !== null;
+    try {
+      return localStorage.getItem(STORAGE_KEY) !== null;
+    } catch {
+      return false;
+    }
   }, []);
 
   return {
