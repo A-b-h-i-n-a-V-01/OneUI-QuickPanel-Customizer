@@ -95,9 +95,9 @@ export const CalibrationPage = ({
         })}
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
+      <div className="flex flex-col md:flex-row gap-6 flex-1 min-h-0">
         {/* Phone mockup + canvas */}
-        <div className="order-2 lg:order-1 flex justify-center lg:justify-start flex-shrink-0">
+        <div className="order-2 md:order-1 flex justify-center md:justify-start flex-shrink-0">
           <div className="flex flex-col items-center gap-4">
             <PhoneMockup width={PHONE_WIDTH}>
               <CalibrationCanvas
@@ -112,7 +112,7 @@ export const CalibrationPage = ({
             </PhoneMockup>
 
             {/* Mobile Actions: directly under the mockup */}
-            <div className="lg:hidden flex flex-col gap-2 w-full px-2 mt-1">
+            <div className="md:hidden flex flex-col gap-2 w-full px-2 mt-1">
               <p className="text-gray-300 text-xs font-bold text-center">
                 Calibrating: <span className="text-[#4F8CFF]">{meta.label}</span>
               </p>
@@ -132,7 +132,7 @@ export const CalibrationPage = ({
         </div>
 
         {/* Right panel info + instructions */}
-        <div className="order-1 lg:order-2 flex-1 flex flex-col gap-4">
+        <div className="order-1 md:order-2 flex-1 flex flex-col gap-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPanel}
@@ -173,7 +173,7 @@ export const CalibrationPage = ({
               )}
 
               {/* Desktop-only action buttons inside card */}
-              <div className="hidden lg:flex gap-2 mt-4">
+              <div className="hidden md:flex gap-2 mt-4">
                 <button onClick={handleNext} className="btn-primary text-xs py-1.5 px-3 flex-initial">
                   {isLast ? 'Finish' : 'Proceed'}
                 </button>
@@ -186,7 +186,7 @@ export const CalibrationPage = ({
               </div>
 
               {/* Mobile-only Skip button remains accessible in the instructions card */}
-              <div className="lg:hidden flex justify-end mt-4">
+              <div className="md:hidden flex justify-end mt-4">
                 <button onClick={handleSkip} className="btn-ghost text-xs py-1.5 px-3">
                   <SkipForward size={12} /> Skip
                 </button>
@@ -201,7 +201,7 @@ export const CalibrationPage = ({
       </div>
 
       {/* Navigation */}
-      <div className="hidden lg:flex items-center justify-between pt-2 border-t border-white/5">
+      <div className="hidden md:flex items-center justify-between pt-2 border-t border-white/5">
         <button onClick={handlePrev} className="btn-ghost">
           <ArrowLeft size={15} /> {currentIdx === 0 ? 'Back' : 'Previous Panel'}
         </button>

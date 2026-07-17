@@ -29,7 +29,7 @@ export const UploadPage = ({
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="flex flex-col lg:flex-row gap-6 flex-1"
+        className="flex flex-col md:flex-row gap-6 flex-1"
       >
         {/* Dropzone */}
         <div className="flex-1 flex flex-col gap-4">
@@ -55,7 +55,7 @@ export const UploadPage = ({
         </div>
 
         {/* Phone preview */}
-        <div className="flex justify-center lg:justify-start">
+        <div className="flex justify-center md:justify-start">
           <div className="flex flex-col items-center gap-3">
             <PhoneMockup width={220}>
               {screenshotUrl ? (

@@ -48,6 +48,11 @@ export const Sidebar = ({
             <p className="text-[9px] text-gray-500 font-medium tracking-wide uppercase">Quick Panel Editor</p>
           </div>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="md:hidden btn-ghost p-1.5 rounded-lg text-gray-400">
+            ✕
+          </button>
+        )}
 
       </div>
 
@@ -119,14 +124,14 @@ export const Sidebar = ({
   return (
     <>
       {/* Desktop view */}
-      <aside className="hidden lg:flex flex-col flex-shrink-0 w-56 h-full">
+      <aside className="hidden md:flex flex-col flex-shrink-0 w-56 h-full">
         {sidebarContent}
       </aside>
 
       {/* Mobile Drawer view */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 flex lg:hidden"
+          className="fixed inset-0 z-40 flex md:hidden"
           style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
           onClick={onClose}
         >

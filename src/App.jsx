@@ -87,9 +87,9 @@ function App() {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-[#0F1115]">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#0F1115]">
       {/* Mobile Top Header */}
-      <header className="lg:hidden flex items-center gap-3 px-4 py-4 border-b border-white/5 bg-[#181A20]/80 backdrop-blur-md z-30">
+      <header className="md:hidden flex items-center gap-3 px-4 py-4 border-b border-white/5 bg-[#181A20]/80 backdrop-blur-md z-30">
         <button
           onClick={() => setSidebarOpen(true)}
           className="btn-ghost p-2 rounded-xl text-gray-400 hover:text-white"
