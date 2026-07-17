@@ -52,10 +52,9 @@ export function useCalibration() {
 
   // ── Panel Rects ───────────────────────────────────────────────────────────
   const updateRect = useCallback((id, rect) => {
-    const isCapsule = id === 'brightness' || id === 'volume';
     const adjustedRect = {
       ...rect,
-      cornerRadius: isCapsule ? rect.height / 2 : rect.cornerRadius,
+      cornerRadius: rect.height / 2,
     };
     setState((prev) => ({
       ...prev,
@@ -64,13 +63,19 @@ export function useCalibration() {
   }, []);
 
   const resetRect = useCallback((id) => {
-    setState((prev) => ({
-      ...prev,
-      panelRects: {
-        ...prev.panelRects,
-        [id]: getDefaultRect(id, prev.screenshotSize.width, prev.screenshotSize.height),
-      },
-    }));
+    setState((prev) => {
+      const defaultRect = getDefaultRect(id, prev.screenshotSize.width, prev.screenshotSize.height);
+      return {
+        ...prev,
+        panelRects: {
+          ...prev.panelRects,
+          [id]: {
+            ...defaultRect,
+            cornerRadius: defaultRect.height / 2,
+          },
+        },
+      };
+    });
   }, []);
 
   // ── Persistence ───────────────────────────────────────────────────────────

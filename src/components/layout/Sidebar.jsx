@@ -48,11 +48,7 @@ export const Sidebar = ({
             <p className="text-[9px] text-gray-500 font-medium tracking-wide uppercase">Quick Panel Editor</p>
           </div>
         </div>
-        {onClose && (
-          <button onClick={onClose} className="lg:hidden btn-ghost p-1.5 rounded-lg text-gray-400">
-            ✕
-          </button>
-        )}
+
       </div>
 
       {/* Navigation Steps */}

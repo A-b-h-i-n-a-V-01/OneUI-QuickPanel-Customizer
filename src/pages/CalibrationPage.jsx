@@ -112,13 +112,21 @@ export const CalibrationPage = ({
             </PhoneMockup>
 
             {/* Mobile Actions: directly under the mockup */}
-            <div className="lg:hidden flex items-center justify-center gap-3 w-full px-2">
-              <button onClick={handleReset} className="btn-secondary text-xs py-1.5 px-3 flex-1 flex items-center justify-center gap-1.5">
-                <RefreshCw size={12} /> Reset
-              </button>
-              <button onClick={handleNext} className="btn-primary text-xs py-1.5 px-4 flex-[1.5] flex items-center justify-center gap-1.5">
-                {isLast ? 'Finish' : 'Proceed'} <ArrowRight size={12} />
-              </button>
+            <div className="lg:hidden flex flex-col gap-2 w-full px-2 mt-1">
+              <p className="text-gray-300 text-xs font-bold text-center">
+                Calibrating: <span className="text-[#4F8CFF]">{meta.label}</span>
+              </p>
+              <div className="flex items-center justify-center gap-2 w-full">
+                <button onClick={handlePrev} className="btn-ghost border border-white/10 rounded-xl text-xs py-1.5 px-3 flex-1 flex items-center justify-center gap-1.5">
+                  <ArrowLeft size={12} /> Back
+                </button>
+                <button onClick={handleReset} className="btn-secondary text-xs py-1.5 px-3 flex-1 flex items-center justify-center gap-1.5">
+                  <RefreshCw size={12} /> Reset
+                </button>
+                <button onClick={handleNext} className="btn-primary text-xs py-1.5 px-4 flex-[1.2] flex items-center justify-center gap-1.5">
+                  {isLast ? 'Finish' : 'Proceed'} <ArrowRight size={12} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

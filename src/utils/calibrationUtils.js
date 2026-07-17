@@ -17,14 +17,13 @@ export function getDefaultRect(
   const { yFraction, heightFraction } = PANEL_DEFAULTS[id];
   const margin = screenshotWidth * 0.04;
   const height = screenshotHeight * heightFraction;
-  const isCapsule = id === 'brightness' || id === 'volume';
   return {
     id,
     x: margin,
     y: screenshotHeight * yFraction,
     width: screenshotWidth - margin * 2,
     height,
-    cornerRadius: isCapsule ? height / 2 : 28,
+    cornerRadius: height / 2,
   };
 }
 
