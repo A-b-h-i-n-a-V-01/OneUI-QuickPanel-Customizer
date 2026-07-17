@@ -1,32 +1,53 @@
-# React + TypeScript + Vite
+# OneUI QuickPanel Customizer (DIY OneUI)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A specialized tool designed to create perfectly aligned wallpapers and custom theme templates for Samsung's OneUI QuickPanel layout. 
 
-Currently, two official plugins are available:
+> [!NOTE]  
+> This project was built for **personal use** to accommodate customization preferences following a new OneUI update. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+🤖 **Built with AI / Vibecoded:** This entire application was developed, iterated, and deployed using agentic AI pairing (vibecoding).
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Key Features
 
-## Expanding the Oxlint configuration
+* **Visual Calibration**: Upload a screenshot of your device's QuickPanel, select active panel areas, and calibrate dimensions in real-time.
+* **Wallpaper Customizer**: Crop, scale, align, and apply modern filters (blur, brightness, contrast, etc.) to your wallpapers matching the exact dimensions of your panel panels.
+* **Real-time Live Preview**: View how your customized wallpaper will blend with the UI elements before exporting.
+* **Persistent Calibration Profiles**: Save, apply, or delete device-specific calibration templates locally in your browser.
+* **Seamless Exporting**: Export the final custom-cropped wallpaper assets tailored for your device screen layout.
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+---
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+## 🛠️ Development & Local Run
+
+This project runs on **React 19**, **Vite 8**, and **Tailwind CSS v4**.
+
+### Install dependencies:
+```bash
+npm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### Start the development server:
+```bash
+npm run dev
+```
+
+### Accessing on mobile/phone:
+To preview changes directly on your phone, start the server exposed to the local network:
+```bash
+npm run dev -- --host
+```
+Then visit the printed **Network** IP (e.g., `http://192.168.1.37:5173`) on your phone.
+
+---
+
+## 📦 GitHub Pages Deployment
+
+The project is configured to easily deploy directly to GitHub Pages.
+
+To deploy a new build:
+```bash
+npm run deploy
+```
+*Note: Make sure your repository settings point the GitHub Pages source branch to the `gh-pages` branch.*
