@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { STORAGE_KEY,  } from '../types';
-import { getDefaultRect } from '../utils/calibrationUtils';
+import { getDefaultRect, getPanelCornerRadius } from '../utils/calibrationUtils';
 
 const DEFAULT_STATE = {
   screenshotUrl: null,
@@ -54,7 +54,7 @@ export function useCalibration() {
   const updateRect = useCallback((id, rect) => {
     const adjustedRect = {
       ...rect,
-      cornerRadius: rect.height / 2,
+      cornerRadius: getPanelCornerRadius(id, rect.height, rect.width + rect.x * 2),
     };
     setState((prev) => ({
       ...prev,
@@ -69,10 +69,7 @@ export function useCalibration() {
         ...prev,
         panelRects: {
           ...prev.panelRects,
-          [id]: {
-            ...defaultRect,
-            cornerRadius: defaultRect.height / 2,
-          },
+          [id]: defaultRect,
         },
       };
     });

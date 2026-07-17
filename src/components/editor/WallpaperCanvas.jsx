@@ -22,23 +22,25 @@ export const WallpaperCanvas = forwardRef(
     ref
   ) => {
     const stageRef = useRef(null);
-    const imageRef1 = useRef(null);
-    const imageRef2 = useRef(null);
+    const imageNodeRef = useRef(null);        // unified ref for active KonvaImage node
     const [wallpaperImg, setWallpaperImg] = useState(null);
     const [screenshotImg, setScreenshotImg] = useState(null);
 
-    // Apply caching for Konva filters (required for Blur)
+    // Always keep transformRef in sync so touch handlers never close over stale state
+    const transformRef = useRef(transform);
+    useEffect(() => { transformRef.current = transform; }, [transform]);
+
+    // -- Blur caching -----------------------------------------------------------
+    // Konva requires .cache() before any filter (including Blur) takes effect.
     useEffect(() => {
-      const imgNode = imageRef1.current || imageRef2.current;
-      if (imgNode) {
-        if (filters.blur > 0) {
-          // Cache the node to apply Konva filters
-          imgNode.cache();
-        } else {
-          imgNode.clearCache();
-        }
-        imgNode.getLayer()?.batchDraw();
+      const node = imageNodeRef.current;
+      if (!node) return;
+      if (filters.blur > 0) {
+        node.cache();
+      } else {
+        node.clearCache();
       }
+      node.getLayer()?.batchDraw();
     }, [filters.blur, wallpaperImg]);
 
     const stageScale = Math.min(
@@ -56,7 +58,6 @@ export const WallpaperCanvas = forwardRef(
       img.crossOrigin = 'Anonymous';
       img.onload = () => {
         setWallpaperImg(img);
-        // Auto-fit on first load
         autoFit(img);
       };
       return () => { img.onload = null; };
@@ -79,111 +80,170 @@ export const WallpaperCanvas = forwardRef(
       const scale = Math.max(scaleX, scaleY);
       const x = (screenshotSize.width - img.width * scale) / 2;
       const y = (screenshotSize.height - img.height * scale) / 2;
-      onTransformChange({ ...transform, x, y, scale });
+      onTransformChange({ ...transformRef.current, x, y, scale });
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [screenshotSize]);
 
     useImperativeHandle(ref, () => ({
       center: () => {
         if (!wallpaperImg) return;
-        const x = (screenshotSize.width - wallpaperImg.width * transform.scale) / 2;
-        const y = (screenshotSize.height - wallpaperImg.height * transform.scale) / 2;
-        onTransformChange({ ...transform, x, y });
+        const t = transformRef.current;
+        const x = (screenshotSize.width - wallpaperImg.width * t.scale) / 2;
+        const y = (screenshotSize.height - wallpaperImg.height * t.scale) / 2;
+        onTransformChange({ ...t, x, y });
       },
-      reset: () => {
-        if (wallpaperImg) autoFit(wallpaperImg);
-      },
+      reset: () => { if (wallpaperImg) autoFit(wallpaperImg); },
       exportImage: () => stageRef.current?.toDataURL({ pixelRatio: 1 / stageScale }) ?? null,
       getStage: () => stageRef.current,
     }));
 
-    // ── Wheel zoom ─────────────────────────────────────────────────────────────
+    // -- Wheel zoom -------------------------------------------------------------
     const handleWheel = (e) => {
       e.evt.preventDefault();
       if (!wallpaperImg) return;
       const pointer = stageRef.current.getPointerPosition();
       if (!pointer) return;
-
+      const t = transformRef.current;
       const scaleBy = 1.07;
-      const oldScale = transform.scale;
+      const oldScale = t.scale;
       const newScale = e.evt.deltaY < 0
         ? Math.min(oldScale * scaleBy, 15)
         : Math.max(oldScale / scaleBy, 0.05);
-
       const nX = pointer.x / stageScale;
       const nY = pointer.y / stageScale;
-      const dx = nX - transform.x;
-      const dy = nY - transform.y;
-      const ratio = newScale / oldScale;
-
+      const dx = nX - t.x;
+      const dy = nY - t.y;
       onTransformChange({
-        ...transform,
+        ...t,
         scale: newScale,
-        x: nX - dx * ratio,
-        y: nY - dy * ratio,
+        x: nX - dx * (newScale / oldScale),
+        y: nY - dy * (newScale / oldScale),
       });
     };
 
-    // ── Touch pinch ────────────────────────────────────────────────────────────
+    // -- Touch pinch-zoom + pan (all at Stage level) ----------------------------
     const lastDist = useRef(0);
     const lastCenter = useRef(null);
+    const lastSingleTouch = useRef(null);
+    const isSingleDragging = useRef(false);
+
+    const getTouchPoints = (evt) => {
+      const rect = stageRef.current.container().getBoundingClientRect();
+      return Array.from(evt.touches).map((t) => ({
+        x: t.clientX - rect.left,
+        y: t.clientY - rect.top,
+      }));
+    };
 
     const handleTouchStart = (e) => {
       if (!wallpaperImg) return;
-      const t1 = e.evt.touches[0];
-      const t2 = e.evt.touches[1];
-      if (t1 && t2) {
-        const rect = stageRef.current.container().getBoundingClientRect();
-        const p1 = { x: t1.clientX - rect.left, y: t1.clientY - rect.top };
-        const p2 = { x: t2.clientX - rect.left, y: t2.clientY - rect.top };
-        lastDist.current = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-        lastCenter.current = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      const pts = getTouchPoints(e.evt);
+      if (pts.length >= 2) {
+        isSingleDragging.current = false;
+        lastSingleTouch.current = null;
+        lastDist.current = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        lastCenter.current = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+      } else if (pts.length === 1) {
+        isSingleDragging.current = true;
+        lastSingleTouch.current = pts[0];
+        lastDist.current = 0;
+        lastCenter.current = null;
       }
     };
 
     const handleTouchMove = (e) => {
       if (!wallpaperImg) return;
-      const t1 = e.evt.touches[0];
-      const t2 = e.evt.touches[1];
-      if (!(t1 && t2)) return;
       e.evt.preventDefault();
+      const pts = getTouchPoints(e.evt);
 
-      const rect = stageRef.current.container().getBoundingClientRect();
-      const p1 = { x: t1.clientX - rect.left, y: t1.clientY - rect.top };
-      const p2 = { x: t2.clientX - rect.left, y: t2.clientY - rect.top };
-      const dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-      const center = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      if (pts.length >= 2) {
+        // Two-finger: pinch-zoom + simultaneous pan
+        isSingleDragging.current = false;
+        const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        const center = { x: (pts[0].x + pts[1].x) / 2, y: (pts[0].y + pts[1].y) / 2 };
+        if (!lastDist.current || !lastCenter.current) {
+          lastDist.current = dist;
+          lastCenter.current = center;
+          return;
+        }
+        const t = transformRef.current;
+        const ratio = dist / lastDist.current;
+        const oldScale = t.scale;
+        const newScale = Math.max(0.05, Math.min(15, oldScale * ratio));
+        const nX = center.x / stageScale;
+        const nY = center.y / stageScale;
+        const dx = nX - t.x;
+        const dy = nY - t.y;
+        // Pan delta from pinch-center movement
+        const panDX = (center.x - lastCenter.current.x) / stageScale;
+        const panDY = (center.y - lastCenter.current.y) / stageScale;
+        onTransformChange({
+          ...t,
+          scale: newScale,
+          x: nX - dx * (newScale / oldScale) + panDX,
+          y: nY - dy * (newScale / oldScale) + panDY,
+        });
+        lastDist.current = dist;
+        lastCenter.current = center;
 
-      if (!lastDist.current) { lastDist.current = dist; lastCenter.current = center; return; }
-
-      const ratio = dist / lastDist.current;
-      const oldScale = transform.scale;
-      const newScale = Math.max(0.05, Math.min(15, oldScale * ratio));
-      const nX = center.x / stageScale;
-      const nY = center.y / stageScale;
-      const dx = nX - transform.x;
-      const dy = nY - transform.y;
-
-      onTransformChange({
-        ...transform,
-        scale: newScale,
-        x: nX - dx * (newScale / oldScale),
-        y: nY - dy * (newScale / oldScale),
-      });
-
-      lastDist.current = dist;
-      lastCenter.current = center;
+      } else if (pts.length === 1 && isSingleDragging.current) {
+        // Single-finger pan
+        const prev = lastSingleTouch.current;
+        if (!prev) { lastSingleTouch.current = pts[0]; return; }
+        const t = transformRef.current;
+        onTransformChange({
+          ...t,
+          x: t.x + (pts[0].x - prev.x) / stageScale,
+          y: t.y + (pts[0].y - prev.y) / stageScale,
+        });
+        lastSingleTouch.current = pts[0];
+      }
     };
 
-    const handleTouchEnd = () => {
-      lastDist.current = 0;
-      lastCenter.current = null;
+    const handleTouchEnd = (e) => {
+      const pts = getTouchPoints(e.evt);
+      if (pts.length < 2) {
+        lastDist.current = 0;
+        lastCenter.current = null;
+      }
+      if (pts.length === 0) {
+        isSingleDragging.current = false;
+        lastSingleTouch.current = null;
+      } else if (pts.length === 1) {
+        // One finger lifted mid-pinch � switch back to single-touch pan
+        isSingleDragging.current = true;
+        lastSingleTouch.current = pts[0];
+      }
     };
 
-    // Panel outline colors for display
+    // Ref callback that captures the Konva node AND re-applies cache immediately
+    const setImageNodeRef = useCallback((node) => {
+      imageNodeRef.current = node;
+      if (node && filters.blur > 0) {
+        node.cache();
+        node.getLayer()?.batchDraw();
+      }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [wallpaperImg]);
+
     const OUTLINE_COLORS = {
       buttons: '#4F8CFF', brightness: '#FACC15', volume: '#34C97A', media: '#C084FC',
     };
+
+    const sharedImageProps = wallpaperImg ? {
+      image: wallpaperImg,
+      x: transform.x,
+      y: transform.y,
+      width: wallpaperImg.width,
+      height: wallpaperImg.height,
+      scaleX: transform.scale,
+      scaleY: transform.scale,
+      rotation: transform.rotation,
+      opacity: filters.opacity,
+      draggable: false,   // pan handled at Stage level
+      filters: filters.blur > 0 ? [Konva.Filters.Blur] : [],
+      blurRadius: filters.blur,
+    } : {};
 
     return (
       <div
@@ -206,7 +266,7 @@ export const WallpaperCanvas = forwardRef(
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          style={{ display: 'block', margin: 'auto' }}
+          style={{ display: 'block', margin: 'auto', touchAction: 'none' }}
         >
           {/* Wallpaper layer */}
           <Layer>
@@ -223,44 +283,10 @@ export const WallpaperCanvas = forwardRef(
                     });
                   }}
                 >
-                  <KonvaImage
-                    ref={imageRef1}
-                    image={wallpaperImg}
-                    x={transform.x}
-                    y={transform.y}
-                    width={wallpaperImg.width}
-                    height={wallpaperImg.height}
-                    scaleX={transform.scale}
-                    scaleY={transform.scale}
-                    rotation={transform.rotation}
-                    opacity={filters.opacity}
-                    draggable
-                    onDragEnd={(e) =>
-                      onTransformChange({ ...transform, x: e.target.x(), y: e.target.y() })
-                    }
-                    filters={filters.blur > 0 ? [Konva.Filters.Blur] : []}
-                    blurRadius={filters.blur}
-                  />
+                  <KonvaImage ref={setImageNodeRef} {...sharedImageProps} />
                 </Group>
               ) : (
-                <KonvaImage
-                  ref={imageRef2}
-                  image={wallpaperImg}
-                  x={transform.x}
-                  y={transform.y}
-                  width={wallpaperImg.width}
-                  height={wallpaperImg.height}
-                  scaleX={transform.scale}
-                  scaleY={transform.scale}
-                  rotation={transform.rotation}
-                  opacity={filters.opacity}
-                  draggable
-                  onDragEnd={(e) =>
-                    onTransformChange({ ...transform, x: e.target.x(), y: e.target.y() })
-                  }
-                  filters={filters.blur > 0 ? [Konva.Filters.Blur] : []}
-                  blurRadius={filters.blur}
-                />
+                <KonvaImage ref={setImageNodeRef} {...sharedImageProps} />
               )
             )}
           </Layer>

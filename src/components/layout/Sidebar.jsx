@@ -35,7 +35,7 @@ export const Sidebar = ({
 }) => {
   const [saveModalOpen, setSaveModalOpen] = useState(false);
 
-  const sidebarContent = (
+  const sidebarContent = ({ showClose = false } = {}) => (
     <div className="glass-heavy border-r border-white/5 flex flex-col w-56 h-full flex-shrink-0 min-h-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
@@ -48,12 +48,11 @@ export const Sidebar = ({
             <p className="text-[9px] text-gray-500 font-medium tracking-wide uppercase">Quick Panel Editor</p>
           </div>
         </div>
-        {onClose && (
-          <button onClick={onClose} className="md:hidden btn-ghost p-1.5 rounded-lg text-gray-400">
+        {showClose && onClose && (
+          <button onClick={onClose} className="btn-ghost p-1.5 rounded-lg text-gray-400">
             ✕
           </button>
         )}
-
       </div>
 
       {/* Navigation Steps */}
@@ -119,13 +118,13 @@ export const Sidebar = ({
           </button>
         </div>
       </div>
-    );
+  );
 
   return (
     <>
       {/* Desktop view */}
       <aside className="hidden md:flex flex-col flex-shrink-0 w-56 h-full">
-        {sidebarContent}
+        {sidebarContent()}
       </aside>
 
       {/* Mobile Drawer view */}
@@ -143,7 +142,7 @@ export const Sidebar = ({
             className="h-full w-56 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
-            {sidebarContent}
+            {sidebarContent({ showClose: true })}
           </motion.div>
         </div>
       )}
