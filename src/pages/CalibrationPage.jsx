@@ -155,7 +155,7 @@ export const CalibrationPage = ({
               )}
 
               <div className="flex gap-2 mt-4">
-                <button onClick={handleNext} className="btn-primary text-xs py-2 px-4 flex-1 sm:flex-initial">
+                <button onClick={handleNext} className="btn-primary text-xs py-2 px-4 flex-initial">
                   {isLast ? 'Finish Calibration' : 'Confirm & Proceed'}
                 </button>
                 <button onClick={handleReset} className="btn-secondary text-xs py-2 px-3">

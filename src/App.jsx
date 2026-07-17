@@ -89,19 +89,19 @@ function App() {
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-[#0F1115]">
       {/* Mobile Top Header */}
-      <header className="lg:hidden flex items-center justify-between px-5 py-4 border-b border-white/5 bg-[#181A20]/80 backdrop-blur-md z-30">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#4F8CFF] to-[#3770E0] flex items-center justify-center font-black text-white text-xs">
-            UI
-          </div>
-          <span className="text-sm font-bold text-white tracking-tight">DIY OneUI</span>
-        </div>
+      <header className="lg:hidden flex items-center gap-3 px-4 py-4 border-b border-white/5 bg-[#181A20]/80 backdrop-blur-md z-30">
         <button
           onClick={() => setSidebarOpen(true)}
           className="btn-ghost p-2 rounded-xl text-gray-400 hover:text-white"
         >
           <Menu size={20} />
         </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#4F8CFF] to-[#3770E0] flex items-center justify-center font-black text-white text-xs">
+            UI
+          </div>
+          <span className="text-sm font-bold text-white tracking-tight">DIY OneUI</span>
+        </div>
       </header>
 
       {/* Sidebar */}
