@@ -98,18 +98,28 @@ export const CalibrationPage = ({
       <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
         {/* Phone mockup + canvas */}
         <div className="order-2 lg:order-1 flex justify-center lg:justify-start flex-shrink-0">
-          <div className="flex flex-col items-center gap-3">
+          <div className="flex flex-col items-center gap-4">
             <PhoneMockup width={PHONE_WIDTH}>
               <CalibrationCanvas
                 screenshotUrl={screenshotUrl}
                 screenshotSize={screenshotSize}
-                containerWidth={PHONE_WIDTH - 28}
-                containerHeight={Math.round((PHONE_WIDTH - 28) * (screenshotSize.height / screenshotSize.width))}
+                containerWidth={PHONE_WIDTH - 20}
+                containerHeight={Math.round(PHONE_WIDTH * (19.5 / 9)) - 20}
                 panelRects={panelRects}
                 activePanelId={currentPanel}
                 onUpdateRect={onUpdateRect}
               />
             </PhoneMockup>
+
+            {/* Mobile Actions: directly under the mockup */}
+            <div className="lg:hidden flex items-center justify-center gap-3 w-full px-2">
+              <button onClick={handleReset} className="btn-secondary text-xs py-1.5 px-3 flex-1 flex items-center justify-center gap-1.5">
+                <RefreshCw size={12} /> Reset
+              </button>
+              <button onClick={handleNext} className="btn-primary text-xs py-1.5 px-4 flex-[1.5] flex items-center justify-center gap-1.5">
+                {isLast ? 'Finish' : 'Proceed'} <ArrowRight size={12} />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -154,14 +164,22 @@ export const CalibrationPage = ({
                 </div>
               )}
 
-              <div className="flex gap-2 mt-4">
-                <button onClick={handleNext} className="btn-primary text-xs py-2 px-4 flex-initial">
-                  {isLast ? 'Finish Calibration' : 'Confirm & Proceed'}
+              {/* Desktop-only action buttons inside card */}
+              <div className="hidden lg:flex gap-2 mt-4">
+                <button onClick={handleNext} className="btn-primary text-xs py-1.5 px-3 flex-initial">
+                  {isLast ? 'Finish' : 'Proceed'}
                 </button>
-                <button onClick={handleReset} className="btn-secondary text-xs py-2 px-3">
+                <button onClick={handleReset} className="btn-secondary text-xs py-1.5 px-3">
                   <RefreshCw size={12} /> Reset
                 </button>
-                <button onClick={handleSkip} className="btn-ghost text-xs py-2 px-3">
+                <button onClick={handleSkip} className="btn-ghost text-xs py-1.5 px-3">
+                  <SkipForward size={12} /> Skip
+                </button>
+              </div>
+
+              {/* Mobile-only Skip button remains accessible in the instructions card */}
+              <div className="lg:hidden flex justify-end mt-4">
+                <button onClick={handleSkip} className="btn-ghost text-xs py-1.5 px-3">
                   <SkipForward size={12} /> Skip
                 </button>
               </div>
