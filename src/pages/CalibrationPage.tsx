@@ -1,0 +1,198 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ArrowLeft, SkipForward, RefreshCw, CheckCircle } from 'lucide-react';
+import { CalibrationCanvas } from '../components/calibration/CalibrationCanvas';
+import { PhoneMockup } from '../components/phone/PhoneMockup';
+import { type PanelType, type PanelRect, PANEL_META } from '../types';
+import { orderedEnabledPanels } from '../utils/calibrationUtils';
+
+interface CalibrationPageProps {
+  screenshotUrl: string;
+  screenshotSize: { width: number; height: number };
+  enabledPanels: PanelType[];
+  panelRects: Partial<Record<PanelType, PanelRect>>;
+  onUpdateRect: (id: PanelType, rect: PanelRect) => void;
+  onResetRect: (id: PanelType) => void;
+  onNext: () => void;
+  onBack: () => void;
+}
+
+export const CalibrationPage: React.FC<CalibrationPageProps> = ({
+  screenshotUrl,
+  screenshotSize,
+  enabledPanels,
+  panelRects,
+  onUpdateRect,
+  onResetRect,
+  onNext,
+  onBack,
+}) => {
+  const panels = orderedEnabledPanels(enabledPanels);
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [skipped, setSkipped] = useState<Set<PanelType>>(new Set());
+
+  const currentPanel = panels[currentIdx];
+  const isLast = currentIdx === panels.length - 1;
+  const meta = currentPanel ? PANEL_META[currentPanel] : null;
+
+  const handlePrev = () => {
+    if (currentIdx > 0) setCurrentIdx((i) => i - 1);
+    else onBack();
+  };
+
+  const handleNext = () => {
+    if (!isLast) setCurrentIdx((i) => i + 1);
+    else onNext();
+  };
+
+  const handleSkip = () => {
+    setSkipped((s) => new Set(s).add(currentPanel));
+    handleNext();
+  };
+
+  const handleReset = () => {
+    if (currentPanel) onResetRect(currentPanel);
+  };
+
+  if (!currentPanel || !meta) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center gap-4">
+        <CheckCircle size={48} className="text-[#34C97A]" />
+        <p className="text-xl font-bold text-white">No panels to calibrate.</p>
+        <button onClick={onNext} className="btn-primary">Continue <ArrowRight size={16} /></button>
+      </div>
+    );
+  }
+
+  const PHONE_WIDTH = 300;
+
+  return (
+    <div className="flex-1 flex flex-col gap-5 max-w-5xl mx-auto w-full px-6 py-8">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+        <p className="text-[#4F8CFF] text-xs font-bold uppercase tracking-wider mb-1">Step 3</p>
+        <h2 className="text-2xl font-black text-white">Calibration Wizard</h2>
+        <p className="text-gray-400 text-sm mt-1">
+          Drag and resize the highlighted overlay to match each panel's exact position in your screenshot.
+        </p>
+      </motion.div>
+
+      {/* Sub-step indicator */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {panels.map((id, idx) => {
+          const done = idx < currentIdx || (idx === currentIdx);
+          const active = idx === currentIdx;
+          const skip = skipped.has(id);
+          return (
+            <button
+              key={id}
+              onClick={() => setCurrentIdx(idx)}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-fast ${
+                active
+                  ? 'bg-[#4F8CFF]/20 border-[#4F8CFF]/50 text-white'
+                  : skip
+                  ? 'bg-white/5 border-white/8 text-gray-600 line-through'
+                  : done
+                  ? 'bg-[#34C97A]/10 border-[#34C97A]/30 text-[#34C97A]'
+                  : 'bg-white/3 border-white/5 text-gray-600'
+              }`}
+            >
+              {skip ? '⊘' : active ? '◉' : idx < currentIdx ? '✓' : '○'}{' '}
+              {PANEL_META[id].label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
+        {/* Phone mockup + canvas */}
+        <div className="flex justify-center lg:justify-start flex-shrink-0">
+          <div className="flex flex-col items-center gap-3">
+            <PhoneMockup width={PHONE_WIDTH}>
+              <CalibrationCanvas
+                screenshotUrl={screenshotUrl}
+                screenshotSize={screenshotSize}
+                containerWidth={PHONE_WIDTH - 28}
+                containerHeight={Math.round((PHONE_WIDTH - 28) * (screenshotSize.height / screenshotSize.width))}
+                panelRects={panelRects}
+                activePanelId={currentPanel}
+                onUpdateRect={onUpdateRect}
+              />
+            </PhoneMockup>
+          </div>
+        </div>
+
+        {/* Right panel info + instructions */}
+        <div className="flex-1 flex flex-col gap-4">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentPanel}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.25 }}
+              className="glass rounded-2xl p-5 border border-white/5"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-11 h-11 rounded-xl bg-[#4F8CFF]/15 text-[#4F8CFF] flex items-center justify-center text-2xl">
+                  {meta.icon}
+                </div>
+                <div>
+                  <p className="font-black text-white text-base">{meta.label}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Step {currentIdx + 1} of {panels.length}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                {meta.description}. Drag the{' '}
+                <span className="text-[#4F8CFF] font-semibold">blue overlay</span> to match the panel
+                position, then resize it from the handles to cover the exact area.
+              </p>
+
+              {/* Rect info */}
+              {panelRects[currentPanel] && (
+                <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 font-mono bg-white/3 rounded-xl p-3">
+                  {(['x', 'y', 'width', 'height'] as const).map((k) => (
+                    <div key={k} className="flex justify-between">
+                      <span className="text-gray-600">{k}</span>
+                      <span className="text-gray-300">{Math.round(panelRects[currentPanel]![k])}px</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-2 mt-4">
+                <button onClick={handleReset} className="btn-secondary text-xs py-2 px-3">
+                  <RefreshCw size={12} /> Reset
+                </button>
+                <button onClick={handleSkip} className="btn-ghost text-xs py-2 px-3">
+                  <SkipForward size={12} /> Skip
+                </button>
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="glass-light rounded-xl p-3 border border-white/5 text-xs text-gray-500 leading-relaxed">
+            <strong className="text-gray-300">Tip:</strong> Drag from the center to move, and drag from the edges or corners to resize. The overlay will snap to match panel boundaries.
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex items-center justify-between pt-2 border-t border-white/5">
+        <button onClick={handlePrev} className="btn-ghost">
+          <ArrowLeft size={15} /> {currentIdx === 0 ? 'Back' : 'Previous Panel'}
+        </button>
+        <button onClick={handleNext} className="btn-primary">
+          {isLast ? (
+            <><CheckCircle size={16} /> Finish Calibration</>
+          ) : (
+            <>Next Panel <ArrowRight size={16} /></>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+};

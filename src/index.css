@@ -1,68 +1,273 @@
 @import "tailwindcss";
 
+/* ── Design Tokens ──────────────────────────────────────────────────────────── */
 @theme {
-  --color-primary: #4F8CFF;
+  --color-bg:       #0F1115;
+  --color-surface:  #181A20;
+  --color-border:   rgba(255,255,255,0.06);
+  --color-primary:  #4F8CFF;
   --color-primary-dark: #3770E0;
-  --color-bg-dark: #0F1115;
-  --color-card-dark: #181A20;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #a0aec0;
+  --color-success:  #34C97A;
+  --color-warning:  #F59E0B;
+  --color-text:     #FFFFFF;
+  --color-muted:    #A0AEC0;
+  --color-subtle:   #4A5568;
+
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-2xl:  40px;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background-color: #0F1115;
   color: #ffffff;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Premium styling utilities */
-.glass-panel {
-  background: rgba(24, 26, 32, 0.7);
+#root {
+  min-height: 100vh;
+}
+
+/* ── Glass Utilities ─────────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(24, 26, 32, 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-.glass-card {
-  background: rgba(24, 26, 32, 0.45);
+.glass-heavy {
+  background: rgba(24, 26, 32, 0.85);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Glow effects */
-.glow-primary {
-  box-shadow: 0 0 30px rgba(79, 140, 255, 0.15);
+/* ── Glow Effects ────────────────────────────────────────────────────────────── */
+.glow-blue {
+  box-shadow: 0 0 32px rgba(79, 140, 255, 0.18), 0 0 8px rgba(79, 140, 255, 0.08);
 }
 
-.glow-hover:hover {
-  box-shadow: 0 0 25px rgba(79, 140, 255, 0.25);
-  border-color: rgba(79, 140, 255, 0.4);
+.glow-blue-sm {
+  box-shadow: 0 0 16px rgba(79, 140, 255, 0.15);
 }
 
-/* Custom transitions */
+.glow-blue-hover:hover {
+  box-shadow: 0 0 28px rgba(79, 140, 255, 0.28);
+}
+
+/* ── Transitions ─────────────────────────────────────────────────────────────── */
 .transition-smooth {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.transition-fast {
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-::-webkit-scrollbar-track {
-  background: #0F1115;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #252830;
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
+/* ── Buttons ─────────────────────────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.75rem;
   background: #4F8CFF;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(79, 140, 255, 0.3);
+}
+
+.btn-primary:hover {
+  background: #3770E0;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(79, 140, 255, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255,255,255,0.06);
+  color: #d1d5db;
+  font-weight: 600;
+  font-size: 0.875rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  border-color: rgba(255,255,255,0.15);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: #9ca3af;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-ghost:hover {
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(239,68,68,0.12);
+  color: #f87171;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: 10px;
+  border: 1px solid rgba(239,68,68,0.2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-danger:hover {
+  background: rgba(239,68,68,0.22);
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #252830; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #4F8CFF; }
+
+/* ── Range Inputs ────────────────────────────────────────────────────────────── */
+input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.1);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4F8CFF;
+  box-shadow: 0 0 8px rgba(79,140,255,0.5);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+/* ── Toggle Switch ───────────────────────────────────────────────────────────── */
+.toggle-track {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-track.active {
+  background: #4F8CFF;
+  border-color: #4F8CFF;
+}
+
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-track.active .toggle-thumb {
+  transform: translateX(20px);
+}
+
+/* ── Animations ──────────────────────────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 12px rgba(79,140,255,0.2); }
+  50%       { box-shadow: 0 0 28px rgba(79,140,255,0.45); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease both;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
 }
