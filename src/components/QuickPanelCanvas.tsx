@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Stage, Layer, Image as KonvaImage } from 'react-konva';
+import { OverlayShape, type ShapeConfig } from './OverlayShape';
 
 interface QuickPanelCanvasProps {
   screenshotUrl: string | null;
@@ -8,6 +9,10 @@ interface QuickPanelCanvasProps {
   onWallpaperTransform?: (pos: { x: number; y: number }, scale: number) => void;
   containerWidth: number;
   containerHeight: number;
+  shapes: ShapeConfig[];
+  selectedShapeId: string | null;
+  onSelectShape: (id: string) => void;
+  onUpdateShape: (updated: ShapeConfig) => void;
 }
 
 export interface QuickPanelCanvasRef {
@@ -17,7 +22,21 @@ export interface QuickPanelCanvasRef {
 }
 
 export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvasProps>(
-  ({ screenshotUrl, wallpaperUrl, screenshotOpacity, onWallpaperTransform, containerWidth, containerHeight }, ref) => {
+  (
+    {
+      screenshotUrl,
+      wallpaperUrl,
+      screenshotOpacity,
+      onWallpaperTransform,
+      containerWidth,
+      containerHeight,
+      shapes,
+      selectedShapeId,
+      onSelectShape,
+      onUpdateShape,
+    },
+    ref
+  ) => {
     const stageRef = useRef<any>(null);
     const [screenshotImg, setScreenshotImg] = useState<HTMLImageElement | null>(null);
     const [wallpaperImg, setWallpaperImg] = useState<HTMLImageElement | null>(null);
@@ -109,19 +128,17 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
       center: centerWallpaper,
       exportImage: () => {
         if (!stageRef.current) return null;
-        // Clean up focus/transformer nodes if any, then export
-        // For now, export the current stage at native screenshot resolution
         try {
           return stageRef.current.toDataURL({
-            pixelRatio: 1 / stageScale, // Invert stage scale to export at native resolution!
+            pixelRatio: 1 / stageScale,
             mimeType: 'image/png',
-            quality: 1
+            quality: 1,
           });
         } catch (err) {
-          console.error("Export failed, attempting standard fallback:", err);
+          console.error('Export failed, attempting standard fallback:', err);
           return stageRef.current.toDataURL();
         }
-      }
+      },
     }));
 
     // Calculate Stage Scale to fit in device container
@@ -133,7 +150,7 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
     const stageWidth = screenshotDim.width * stageScale;
     const stageHeight = screenshotDim.height * stageScale;
 
-    // Mouse wheel zoom centered on cursor
+    // Mouse wheel zoom centered on cursor for wallpaper
     const handleWheel = (e: any) => {
       if (!wallpaperImg) return;
       e.evt.preventDefault();
@@ -144,13 +161,10 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
 
       const scaleBy = 1.08;
       const oldScale = wallpaperScale;
-      
-      // Calculate new scale
+
       const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
       const boundedScale = Math.max(0.1, Math.min(15, newScale));
 
-      // Calculate new position to keep zoom centered on cursor
-      // Convert pointer to native canvas coordinates
       const nativePointerX = pointer.x / stageScale;
       const nativePointerY = pointer.y / stageScale;
 
@@ -175,12 +189,8 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
     const getDistance = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
       return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
     };
-
     const getCenter = (p1: { x: number; y: number }, p2: { x: number; y: number }) => {
-      return {
-        x: (p1.x + p2.x) / 2,
-        y: (p1.y + p2.y) / 2,
-      };
+      return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
     };
 
     const handleTouchMove = (e: any) => {
@@ -193,14 +203,8 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
         const stage = stageRef.current;
         const rect = stage.container().getBoundingClientRect();
 
-        const p1 = {
-          x: touch1.clientX - rect.left,
-          y: touch1.clientY - rect.top,
-        };
-        const p2 = {
-          x: touch2.clientX - rect.left,
-          y: touch2.clientY - rect.top,
-        };
+        const p1 = { x: touch1.clientX - rect.left, y: touch1.clientY - rect.top };
+        const p2 = { x: touch2.clientX - rect.left, y: touch2.clientY - rect.top };
 
         const dist = getDistance(p1, p2);
         const center = getCenter(p1, p2);
@@ -216,7 +220,6 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
         const newScale = oldScale * scaleBy;
         const boundedScale = Math.max(0.1, Math.min(15, newScale));
 
-        // Center relative to native coordinates
         const nativeCenterX = center.x / stageScale;
         const nativeCenterY = center.y / stageScale;
 
@@ -250,7 +253,7 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
     };
 
     return (
-      <div 
+      <div
         className="relative overflow-hidden flex items-center justify-center bg-[#07080a] select-none"
         style={{ width: containerWidth, height: containerHeight }}
       >
@@ -275,7 +278,7 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
           className="shadow-inner"
         >
           <Layer>
-            {/* 1. Wallpaper Image (Behind) */}
+            {/* Wallpaper */}
             {wallpaperImg && (
               <KonvaImage
                 image={wallpaperImg}
@@ -293,8 +296,7 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
                 }}
               />
             )}
-
-            {/* 2. Screenshot Image (On Top) */}
+            {/* Screenshot */}
             {screenshotImg && (
               <KonvaImage
                 image={screenshotImg}
@@ -303,9 +305,19 @@ export const QuickPanelCanvas = forwardRef<QuickPanelCanvasRef, QuickPanelCanvas
                 width={screenshotDim.width}
                 height={screenshotDim.height}
                 opacity={screenshotOpacity}
-                listening={false} // Click-through enabled
+                listening={false}
               />
             )}
+            {/* Overlay Shapes */}
+            {shapes.map((shape) => (
+              <OverlayShape
+                key={shape.id}
+                shapeProps={shape}
+                isSelected={selectedShapeId === shape.id}
+                onSelect={() => onSelectShape(shape.id)}
+                onChange={onUpdateShape}
+              />
+            ))}
           </Layer>
         </Stage>
       </div>
