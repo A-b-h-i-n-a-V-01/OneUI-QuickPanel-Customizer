@@ -1,16 +1,11 @@
 import React from 'react';
 import { Check } from 'lucide-react';
 
-interface Step {
-  label: string;
-}
 
-interface StepIndicatorProps {
-  currentStep: number;  // 1-indexed
-  steps: Step[];
-}
 
-export const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep, steps }) => {
+
+
+export const StepIndicator = ({ currentStep, steps }) => {
   return (
     <div className="flex items-center gap-0">
       {steps.map((step, idx) => {

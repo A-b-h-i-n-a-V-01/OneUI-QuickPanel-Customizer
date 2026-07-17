@@ -2,18 +2,9 @@ import React, { useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Upload, CheckCircle, X } from 'lucide-react';
 
-interface DropzoneCardProps {
-  title: string;
-  description: string;
-  previewUrl: string | null;
-  onFileSelect: (file: File) => void;
-  onClear: () => void;
-  accept?: Record<string, string[]>;
-  icon?: React.ReactNode;
-  compact?: boolean;
-}
 
-export const DropzoneCard: React.FC<DropzoneCardProps> = ({
+
+export const DropzoneCard = ({
   title,
   description,
   previewUrl,
@@ -24,7 +15,7 @@ export const DropzoneCard: React.FC<DropzoneCardProps> = ({
   compact = false,
 }) => {
   const onDrop = useCallback(
-    (accepted: File[]) => {
+    (accepted) => {
       if (accepted[0]) onFileSelect(accepted[0]);
     },
     [onFileSelect]

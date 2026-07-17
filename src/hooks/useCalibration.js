@@ -1,25 +1,19 @@
 import { useState, useCallback } from 'react';
-import {
-  type PanelType,
-  type PanelRect,
-  type CalibrationState,
-  type SavedCalibration,
-  STORAGE_KEY,
-} from '../types';
+import { STORAGE_KEY,  } from '../types';
 import { getDefaultRect } from '../utils/calibrationUtils';
 
-const DEFAULT_STATE: CalibrationState = {
+const DEFAULT_STATE = {
   screenshotUrl: null,
   screenshotSize: { width: 1080, height: 2400 },
-  enabledPanels: ['buttons', 'brightness'],
+  enabledPanels: [],
   panelRects: {},
 };
 
 export function useCalibration() {
-  const [state, setState] = useState<CalibrationState>(DEFAULT_STATE);
+  const [state, setState] = useState(DEFAULT_STATE);
 
   // ── Screenshot ────────────────────────────────────────────────────────────
-  const setScreenshot = useCallback((url: string, width: number, height: number) => {
+  const setScreenshot = useCallback((url, width, height) => {
     setState((prev) => ({
       ...prev,
       screenshotUrl: url,
@@ -30,7 +24,7 @@ export function useCalibration() {
           id,
           prev.panelRects[id] ?? getDefaultRect(id, width, height),
         ])
-      ) as Partial<Record<PanelType, PanelRect>>,
+      ),
     }));
   }, []);
 
@@ -39,7 +33,7 @@ export function useCalibration() {
   }, []);
 
   // ── Enabled Panels ────────────────────────────────────────────────────────
-  const togglePanel = useCallback((id: PanelType) => {
+  const togglePanel = useCallback((id) => {
     setState((prev) => {
       const enabled = prev.enabledPanels.includes(id)
         ? prev.enabledPanels.filter((p) => p !== id)
@@ -57,14 +51,19 @@ export function useCalibration() {
   }, []);
 
   // ── Panel Rects ───────────────────────────────────────────────────────────
-  const updateRect = useCallback((id: PanelType, rect: PanelRect) => {
+  const updateRect = useCallback((id, rect) => {
+    const isCapsule = id === 'brightness' || id === 'volume';
+    const adjustedRect = {
+      ...rect,
+      cornerRadius: isCapsule ? rect.height / 2 : rect.cornerRadius,
+    };
     setState((prev) => ({
       ...prev,
-      panelRects: { ...prev.panelRects, [id]: rect },
+      panelRects: { ...prev.panelRects, [id]: adjustedRect },
     }));
   }, []);
 
-  const resetRect = useCallback((id: PanelType) => {
+  const resetRect = useCallback((id) => {
     setState((prev) => ({
       ...prev,
       panelRects: {
@@ -77,9 +76,9 @@ export function useCalibration() {
   // ── Persistence ───────────────────────────────────────────────────────────
   /** Save calibration rects to localStorage (NOT the screenshot URL) */
   const saveCalibration = useCallback(
-    (label?: string): boolean => {
+    (label) => {
       try {
-        const save: SavedCalibration = {
+        const save = {
           version: 1,
           screenshotWidth: state.screenshotSize.width,
           screenshotHeight: state.screenshotSize.height,
@@ -97,17 +96,17 @@ export function useCalibration() {
     [state]
   );
 
-  const loadCalibration = useCallback((): SavedCalibration | null => {
+  const loadCalibration = useCallback(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
-      return JSON.parse(raw) as SavedCalibration;
+      return JSON.parse(raw);
     } catch {
       return null;
     }
   }, []);
 
-  const applySavedCalibration = useCallback((saved: SavedCalibration) => {
+  const applySavedCalibration = useCallback((saved) => {
     setState((prev) => ({
       ...prev,
       screenshotSize: { width: saved.screenshotWidth, height: saved.screenshotHeight },
@@ -120,7 +119,7 @@ export function useCalibration() {
     localStorage.removeItem(STORAGE_KEY);
   }, []);
 
-  const hasSavedCalibration = useCallback((): boolean => {
+  const hasSavedCalibration = useCallback(() => {
     return localStorage.getItem(STORAGE_KEY) !== null;
   }, []);
 

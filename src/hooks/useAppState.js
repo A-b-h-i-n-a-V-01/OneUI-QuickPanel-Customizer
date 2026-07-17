@@ -1,10 +1,10 @@
 import { useState, useCallback } from 'react';
-import { type AppPage, PAGE_ORDER } from '../types';
+import { PAGE_ORDER } from '../types';
 
 export function useAppState() {
-  const [currentPage, setCurrentPage] = useState<AppPage>('home');
+  const [currentPage, setCurrentPage] = useState('home');
 
-  const navigateTo = useCallback((page: AppPage) => {
+  const navigateTo = useCallback((page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);

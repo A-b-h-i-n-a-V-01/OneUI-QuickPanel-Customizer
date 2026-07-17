@@ -1,22 +1,13 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft, Eye } from 'lucide-react';
-import { WallpaperCanvas, type WallpaperCanvasRef } from '../components/editor/WallpaperCanvas';
+import { WallpaperCanvas } from '../components/editor/WallpaperCanvas';
 import { PhoneMockup } from '../components/phone/PhoneMockup';
-import { type WallpaperTransform, type WallpaperFilters, type PanelType, type PanelRect, PANEL_META } from '../types';
+import { PANEL_META } from '../types';
 
-interface PreviewPageProps {
-  wallpaperUrl: string;
-  screenshotSize: { width: number; height: number };
-  transform: WallpaperTransform;
-  filters: WallpaperFilters;
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  enabledPanels: PanelType[];
-  onNext: () => void;
-  onBack: () => void;
-}
 
-export const PreviewPage: React.FC<PreviewPageProps> = ({
+
+export const PreviewPage = ({
   wallpaperUrl,
   screenshotSize,
   transform,
@@ -26,7 +17,7 @@ export const PreviewPage: React.FC<PreviewPageProps> = ({
   onNext,
   onBack,
 }) => {
-  const canvasRef = useRef<WallpaperCanvasRef>(null);
+  const canvasRef = useRef(null);
   const PHONE_WIDTH = 300;
 
   return (
@@ -59,6 +50,7 @@ export const PreviewPage: React.FC<PreviewPageProps> = ({
               transform={transform}
               filters={filters}
               panelRects={panelRects}
+              enabledPanels={enabledPanels}
               showPanelOutlines={true}
               containerWidth={PHONE_WIDTH - 28}
               containerHeight={Math.round((PHONE_WIDTH - 28) * (screenshotSize.height / screenshotSize.width))}

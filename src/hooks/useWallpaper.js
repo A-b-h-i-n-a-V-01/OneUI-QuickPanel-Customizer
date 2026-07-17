@@ -1,18 +1,14 @@
 import { useState, useCallback } from 'react';
-import {
-  type WallpaperState,
-  type WallpaperTransform,
-  type WallpaperFilters,
-} from '../types';
 
-const DEFAULT_TRANSFORM: WallpaperTransform = {
+
+const DEFAULT_TRANSFORM = {
   x: 0,
   y: 0,
   scale: 1,
   rotation: 0,
 };
 
-const DEFAULT_FILTERS: WallpaperFilters = {
+const DEFAULT_FILTERS = {
   blur: 0,
   opacity: 1,
   brightness: 1,
@@ -21,13 +17,13 @@ const DEFAULT_FILTERS: WallpaperFilters = {
 };
 
 export function useWallpaper() {
-  const [state, setState] = useState<WallpaperState>({
+  const [state, setState] = useState({
     wallpaperUrl: null,
     transform: DEFAULT_TRANSFORM,
     filters: DEFAULT_FILTERS,
   });
 
-  const setWallpaper = useCallback((url: string) => {
+  const setWallpaper = useCallback((url) => {
     setState((prev) => ({ ...prev, wallpaperUrl: url }));
   }, []);
 
@@ -35,22 +31,19 @@ export function useWallpaper() {
     setState((prev) => ({ ...prev, wallpaperUrl: null, transform: DEFAULT_TRANSFORM }));
   }, []);
 
-  const setTransform = useCallback((transform: WallpaperTransform) => {
+  const setTransform = useCallback((transform) => {
     setState((prev) => ({ ...prev, transform }));
   }, []);
 
-  const updateTransform = useCallback((partial: Partial<WallpaperTransform>) => {
+  const updateTransform = useCallback((partial) => {
     setState((prev) => ({ ...prev, transform: { ...prev.transform, ...partial } }));
   }, []);
 
-  const setFilters = useCallback((filters: WallpaperFilters) => {
+  const setFilters = useCallback((filters) => {
     setState((prev) => ({ ...prev, filters }));
   }, []);
 
-  const updateFilter = useCallback(<K extends keyof WallpaperFilters>(
-    key: K,
-    value: WallpaperFilters[K]
-  ) => {
+  const updateFilter = useCallback((key, value) => {
     setState((prev) => ({
       ...prev,
       filters: { ...prev.filters, [key]: value },

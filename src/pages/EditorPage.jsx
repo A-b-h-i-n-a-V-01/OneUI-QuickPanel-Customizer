@@ -1,40 +1,28 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
-import { WallpaperCanvas, type WallpaperCanvasRef } from '../components/editor/WallpaperCanvas';
+import { WallpaperCanvas } from '../components/editor/WallpaperCanvas';
 import { Toolbar } from '../components/editor/Toolbar';
 import { PhoneMockup } from '../components/phone/PhoneMockup';
-import { type WallpaperTransform, type WallpaperFilters, type PanelType, type PanelRect } from '../types';
 
-interface EditorPageProps {
-  wallpaperUrl: string;
-  screenshotUrl: string | null;
-  screenshotSize: { width: number; height: number };
-  transform: WallpaperTransform;
-  filters: WallpaperFilters;
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  enabledPanels: PanelType[];
-  onUpdateTransform: (t: Partial<WallpaperTransform>) => void;
-  onUpdateFilter: <K extends keyof WallpaperFilters>(key: K, value: WallpaperFilters[K]) => void;
-  onTransformChange: (t: WallpaperTransform) => void;
-  onNext: () => void;
-  onBack: () => void;
-}
 
-export const EditorPage: React.FC<EditorPageProps> = ({
+
+
+export const EditorPage = ({
   wallpaperUrl,
   screenshotUrl,
   screenshotSize,
   transform,
   filters,
   panelRects,
+  enabledPanels,
   onUpdateTransform,
   onUpdateFilter,
   onTransformChange,
   onNext,
   onBack,
 }) => {
-  const canvasRef = useRef<WallpaperCanvasRef>(null);
+  const canvasRef = useRef(null);
   const [screenshotOpacity, setScreenshotOpacity] = useState(0.55);
   const [showOutlines, setShowOutlines] = useState(true);
 
@@ -53,7 +41,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
 
       <div className="flex flex-col lg:flex-row gap-5 flex-1 min-h-0">
         {/* Phone preview + canvas */}
-        <div className="flex justify-center lg:justify-start flex-shrink-0 flex-col items-center gap-3">
+        <div className="order-2 lg:order-1 flex justify-center lg:justify-start flex-shrink-0 flex-col items-center gap-3">
           <PhoneMockup width={PHONE_WIDTH}>
             <WallpaperCanvas
               ref={canvasRef}
@@ -64,6 +52,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
               transform={transform}
               filters={filters}
               panelRects={panelRects}
+              enabledPanels={enabledPanels}
               showPanelOutlines={showOutlines}
               containerWidth={PHONE_WIDTH - 28}
               containerHeight={Math.round((PHONE_WIDTH - 28) * (screenshotSize.height / screenshotSize.width))}
@@ -103,7 +92,7 @@ export const EditorPage: React.FC<EditorPageProps> = ({
         </div>
 
         {/* Toolbar */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="order-1 lg:order-2 flex-1 overflow-y-auto">
           <Toolbar
             transform={transform}
             filters={filters}

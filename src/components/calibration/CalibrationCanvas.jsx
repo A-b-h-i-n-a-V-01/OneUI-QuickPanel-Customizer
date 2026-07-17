@@ -1,19 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Image as KonvaImage } from 'react-konva';
 import { OverlayPanel } from './OverlayPanel';
-import { type PanelType, type PanelRect } from '../../types';
 
-interface CalibrationCanvasProps {
-  screenshotUrl: string;
-  screenshotSize: { width: number; height: number };
-  containerWidth: number;
-  containerHeight: number;
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  activePanelId: PanelType | null;
-  onUpdateRect: (id: PanelType, rect: PanelRect) => void;
-}
 
-export const CalibrationCanvas: React.FC<CalibrationCanvasProps> = ({
+
+
+export const CalibrationCanvas = ({
   screenshotUrl,
   screenshotSize,
   containerWidth,
@@ -22,8 +14,8 @@ export const CalibrationCanvas: React.FC<CalibrationCanvasProps> = ({
   activePanelId,
   onUpdateRect,
 }) => {
-  const [screenshotImg, setScreenshotImg] = useState<HTMLImageElement | null>(null);
-  const stageRef = useRef<any>(null);
+  const [screenshotImg, setScreenshotImg] = useState(null);
+  const stageRef = useRef(null);
 
   useEffect(() => {
     if (!screenshotUrl) return;
@@ -42,7 +34,7 @@ export const CalibrationCanvas: React.FC<CalibrationCanvasProps> = ({
   const stageWidth  = screenshotSize.width  * stageScale;
   const stageHeight = screenshotSize.height * stageScale;
 
-  const handleStageClick = (e: any) => {
+  const handleStageClick = (e) => {
     // Deselect when clicking empty area
     if (e.target === e.target.getStage()) {
       // no-op; keep current panel selected during calibration
@@ -55,7 +47,12 @@ export const CalibrationCanvas: React.FC<CalibrationCanvasProps> = ({
       style={{ width: containerWidth, height: containerHeight }}
     >
       {!screenshotImg && (
-        <p className="text-gray-600 text-sm">Loading screenshot…</p>
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#07080b]">
+          <p className="text-gray-400 font-bold text-sm mb-1">No Screenshot Loaded</p>
+          <p className="text-gray-600 text-xs max-w-[200px] leading-relaxed">
+            Upload your screenshot in Step 2 to calibrate on top of it.
+          </p>
+        </div>
       )}
 
       <Stage
@@ -84,7 +81,7 @@ export const CalibrationCanvas: React.FC<CalibrationCanvasProps> = ({
         <Layer>
           {activePanelId && panelRects[activePanelId] && (
             <OverlayPanel
-              rect={panelRects[activePanelId]!}
+              rect={panelRects[activePanelId]}
               isSelected={true}
               onSelect={() => {}}
               onChange={(updated) => onUpdateRect(activePanelId, updated)}

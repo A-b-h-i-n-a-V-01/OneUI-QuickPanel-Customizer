@@ -1,12 +1,9 @@
 import React from 'react';
 
-interface PhoneMockupProps {
-  children: React.ReactNode;
-  width?: number;
-}
+
 
 /** Realistic Samsung Galaxy phone frame SVG border */
-export const PhoneMockup: React.FC<PhoneMockupProps> = ({ children, width = 340 }) => {
+export const PhoneMockup = ({ children, width = 340 }) => {
   const height = width * (19.5 / 9);
   const borderRadius = width * 0.14;
 

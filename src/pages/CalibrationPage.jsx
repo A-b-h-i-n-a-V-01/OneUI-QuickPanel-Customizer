@@ -3,21 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, SkipForward, RefreshCw, CheckCircle } from 'lucide-react';
 import { CalibrationCanvas } from '../components/calibration/CalibrationCanvas';
 import { PhoneMockup } from '../components/phone/PhoneMockup';
-import { type PanelType, type PanelRect, PANEL_META } from '../types';
+import { PANEL_META } from '../types';
 import { orderedEnabledPanels } from '../utils/calibrationUtils';
 
-interface CalibrationPageProps {
-  screenshotUrl: string;
-  screenshotSize: { width: number; height: number };
-  enabledPanels: PanelType[];
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  onUpdateRect: (id: PanelType, rect: PanelRect) => void;
-  onResetRect: (id: PanelType) => void;
-  onNext: () => void;
-  onBack: () => void;
-}
 
-export const CalibrationPage: React.FC<CalibrationPageProps> = ({
+
+export const CalibrationPage = ({
   screenshotUrl,
   screenshotSize,
   enabledPanels,
@@ -29,7 +20,7 @@ export const CalibrationPage: React.FC<CalibrationPageProps> = ({
 }) => {
   const panels = orderedEnabledPanels(enabledPanels);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [skipped, setSkipped] = useState<Set<PanelType>>(new Set());
+  const [skipped, setSkipped] = useState(new Set());
 
   const currentPanel = panels[currentIdx];
   const isLast = currentIdx === panels.length - 1;
@@ -80,9 +71,9 @@ export const CalibrationPage: React.FC<CalibrationPageProps> = ({
       {/* Sub-step indicator */}
       <div className="flex items-center gap-3 flex-wrap">
         {panels.map((id, idx) => {
-          const done = idx < currentIdx || (idx === currentIdx);
-          const active = idx === currentIdx;
           const skip = skipped.has(id);
+          const done = idx < currentIdx && !skip;
+          const active = idx === currentIdx;
           return (
             <button
               key={id}
@@ -106,7 +97,7 @@ export const CalibrationPage: React.FC<CalibrationPageProps> = ({
 
       <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
         {/* Phone mockup + canvas */}
-        <div className="flex justify-center lg:justify-start flex-shrink-0">
+        <div className="order-2 lg:order-1 flex justify-center lg:justify-start flex-shrink-0">
           <div className="flex flex-col items-center gap-3">
             <PhoneMockup width={PHONE_WIDTH}>
               <CalibrationCanvas
@@ -123,7 +114,7 @@ export const CalibrationPage: React.FC<CalibrationPageProps> = ({
         </div>
 
         {/* Right panel info + instructions */}
-        <div className="flex-1 flex flex-col gap-4">
+        <div className="order-1 lg:order-2 flex-1 flex flex-col gap-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentPanel}
@@ -154,16 +145,19 @@ export const CalibrationPage: React.FC<CalibrationPageProps> = ({
               {/* Rect info */}
               {panelRects[currentPanel] && (
                 <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 font-mono bg-white/3 rounded-xl p-3">
-                  {(['x', 'y', 'width', 'height'] as const).map((k) => (
+                  {(['x', 'y', 'width', 'height']).map((k) => (
                     <div key={k} className="flex justify-between">
                       <span className="text-gray-600">{k}</span>
-                      <span className="text-gray-300">{Math.round(panelRects[currentPanel]![k])}px</span>
+                      <span className="text-gray-300">{Math.round(panelRects[currentPanel][k])}px</span>
                     </div>
                   ))}
                 </div>
               )}
 
               <div className="flex gap-2 mt-4">
+                <button onClick={handleNext} className="btn-primary text-xs py-2 px-4 flex-1 sm:flex-initial">
+                  {isLast ? 'Finish Calibration' : 'Confirm & Proceed'}
+                </button>
                 <button onClick={handleReset} className="btn-secondary text-xs py-2 px-3">
                   <RefreshCw size={12} /> Reset
                 </button>
@@ -175,13 +169,13 @@ export const CalibrationPage: React.FC<CalibrationPageProps> = ({
           </AnimatePresence>
 
           <div className="glass-light rounded-xl p-3 border border-white/5 text-xs text-gray-500 leading-relaxed">
-            <strong className="text-gray-300">Tip:</strong> Drag from the center to move, and drag from the edges or corners to resize. The overlay will snap to match panel boundaries.
+            <strong className="text-gray-300">Tip:</strong> Drag from the center to move, and drag from the edges or corners to resize.
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex items-center justify-between pt-2 border-t border-white/5">
+      <div className="hidden lg:flex items-center justify-between pt-2 border-t border-white/5">
         <button onClick={handlePrev} className="btn-ghost">
           <ArrowLeft size={15} /> {currentIdx === 0 ? 'Back' : 'Previous Panel'}
         </button>

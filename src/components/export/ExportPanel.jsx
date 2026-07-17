@@ -1,17 +1,12 @@
 import React, { useState } from 'react';
 import { Download, Package, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { type PanelType, type PanelRect, PANEL_META } from '../../types';
+import { PANEL_META } from '../../types';
 import { exportPanelPNGs } from '../../utils/exportUtils';
 
-interface ExportPanelProps {
-  enabledPanels: PanelType[];
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  stageRef: React.RefObject<any>;
-  stageScale: number;
-}
 
-export const ExportPanel: React.FC<ExportPanelProps> = ({
+
+export const ExportPanel = ({
   enabledPanels,
   panelRects,
   stageRef,
@@ -22,10 +17,12 @@ export const ExportPanel: React.FC<ExportPanelProps> = ({
 
   const handleExport = async () => {
     if (!stageRef.current) return;
+    const stage = stageRef.current.getStage();
+    if (!stage) return;
     setExporting(true);
     setDone(false);
     try {
-      await exportPanelPNGs(stageRef.current, panelRects, enabledPanels, stageScale);
+      await exportPanelPNGs(stage, panelRects, enabledPanels, stageScale);
       setDone(true);
       setTimeout(() => setDone(false), 3000);
     } finally {

@@ -4,22 +4,13 @@ import {
   Home, Upload, Layers, Sliders, Image, Eye, Download,
   Save, CheckCircle, Circle, Dot
 } from 'lucide-react';
-import { type AppPage, type PanelType, PANEL_META, PAGE_ORDER } from '../../types';
+import { PANEL_META, PAGE_ORDER } from '../../types';
 import { SaveLoadModal } from '../ui/SaveLoadModal';
-import { type SavedCalibration } from '../../types';
 
-interface SidebarProps {
-  currentPage: AppPage;
-  enabledPanels: PanelType[];
-  completedPages: Set<AppPage>;
-  onNavigate: (page: AppPage) => void;
-  onSave: (label?: string) => boolean;
-  onLoad: () => SavedCalibration | null;
-  onApply: (saved: SavedCalibration) => void;
-  onDelete: () => void;
-}
 
-const PAGE_META: Record<AppPage, { label: string; icon: React.ReactNode; short: string }> = {
+
+
+const PAGE_META = {
   home:              { label: 'Home',            icon: <Home size={15} />,      short: 'Home' },
   upload:            { label: 'Upload Screenshot', icon: <Upload size={15} />,   short: 'Screenshot' },
   'panel-select':    { label: 'Select Panels',   icon: <Layers size={15} />,    short: 'Panels' },
@@ -30,7 +21,7 @@ const PAGE_META: Record<AppPage, { label: string; icon: React.ReactNode; short: 
   export:            { label: 'Export PNGs',     icon: <Download size={15} />,  short: 'Export' },
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({
+export const Sidebar = ({
   currentPage,
   enabledPanels,
   completedPages,
@@ -39,14 +30,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onLoad,
   onApply,
   onDelete,
+  isOpen = false,
+  onClose,
 }) => {
   const [saveModalOpen, setSaveModalOpen] = useState(false);
 
-  return (
-    <>
-      <aside className="glass-heavy border-r border-white/5 flex flex-col w-56 flex-shrink-0 min-h-0">
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-white/5 flex items-center gap-3">
+  const sidebarContent = (
+    <div className="glass-heavy border-r border-white/5 flex flex-col w-56 h-full flex-shrink-0 min-h-0">
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
+        <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4F8CFF] to-[#3770E0] flex items-center justify-center font-black text-white text-sm shadow-lg shadow-[#4F8CFF]/30">
             UI
           </div>
@@ -55,9 +48,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="text-[9px] text-gray-500 font-medium tracking-wide uppercase">Quick Panel Editor</p>
           </div>
         </div>
+        {onClose && (
+          <button onClick={onClose} className="lg:hidden btn-ghost p-1.5 rounded-lg text-gray-400">
+            ✕
+          </button>
+        )}
+      </div>
 
-        {/* Navigation Steps */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
+      {/* Navigation Steps */}
+      <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
           <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider px-2 mb-2">Workflow</p>
           {PAGE_ORDER.map((page) => {
             const meta = PAGE_META[page];
@@ -118,7 +117,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <Save size={13} /> Save Calibration
           </button>
         </div>
+      </div>
+    );
+
+  return (
+    <>
+      {/* Desktop view */}
+      <aside className="hidden lg:flex flex-col flex-shrink-0 w-56 h-full">
+        {sidebarContent}
       </aside>
+
+      {/* Mobile Drawer view */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 flex lg:hidden"
+          style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(4px)' }}
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ x: -220 }}
+            animate={{ x: 0 }}
+            exit={{ x: -220 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="h-full w-56 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {sidebarContent}
+          </motion.div>
+        </div>
+      )}
 
       <SaveLoadModal
         isOpen={saveModalOpen}

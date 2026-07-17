@@ -1,33 +1,27 @@
 import React, { useRef, useEffect } from 'react';
 import { Rect, Transformer } from 'react-konva';
-import type Konva from 'konva';
-import { type PanelRect } from '../../types';
 
-interface OverlayPanelProps {
-  rect: PanelRect;
-  isSelected: boolean;
-  onSelect: () => void;
-  onChange: (updated: PanelRect) => void;
-  stageScale: number;
-}
+
+
+
 
 /** Color palette for each panel type */
-const PANEL_COLORS: Record<string, { fill: string; stroke: string }> = {
+const PANEL_COLORS = {
   buttons:    { fill: 'rgba(79,140,255,0.18)',  stroke: '#4F8CFF' },
   brightness: { fill: 'rgba(250,204,21,0.18)',  stroke: '#FACC15' },
   volume:     { fill: 'rgba(52,201,122,0.18)',  stroke: '#34C97A' },
   media:      { fill: 'rgba(192,132,252,0.18)', stroke: '#C084FC' },
 };
 
-export const OverlayPanel: React.FC<OverlayPanelProps> = ({
+export const OverlayPanel = ({
   rect,
   isSelected,
   onSelect,
   onChange,
   stageScale,
 }) => {
-  const shapeRef = useRef<Konva.Rect>(null);
-  const trRef = useRef<Konva.Transformer>(null);
+  const shapeRef = useRef(null);
+  const trRef = useRef(null);
   const colors = PANEL_COLORS[rect.id] ?? PANEL_COLORS.buttons;
 
   useEffect(() => {
@@ -46,15 +40,15 @@ export const OverlayPanel: React.FC<OverlayPanelProps> = ({
         width={rect.width}
         height={rect.height}
         cornerRadius={rect.cornerRadius}
-        fill={colors.fill}
+        fill="transparent"
         stroke={colors.stroke}
-        strokeWidth={2 / stageScale}
+        strokeWidth={1.5 / stageScale}
         draggable
         onClick={onSelect}
         onTap={onSelect}
         shadowColor={colors.stroke}
-        shadowBlur={12 / stageScale}
-        shadowOpacity={isSelected ? 0.5 : 0.2}
+        shadowBlur={4 / stageScale}
+        shadowOpacity={0.4}
         onDragEnd={(e) => {
           onChange({
             ...rect,
@@ -88,16 +82,14 @@ export const OverlayPanel: React.FC<OverlayPanelProps> = ({
           rotateEnabled={false}
           keepRatio={false}
           anchorStroke={colors.stroke}
-          anchorFill={colors.stroke}
-          anchorSize={8 / stageScale}
+          anchorFill="transparent"
+          anchorSize={4 / stageScale}
           anchorCornerRadius={2}
           borderStroke={colors.stroke}
-          borderStrokeWidth={1.5 / stageScale}
-          borderDash={[4 / stageScale, 2 / stageScale]}
+          borderStrokeWidth={0.8 / stageScale}
+          borderDash={[2 / stageScale, 2 / stageScale]}
           enabledAnchors={[
-            'top-left', 'top-center', 'top-right',
-            'middle-right', 'bottom-right', 'bottom-center',
-            'bottom-left', 'middle-left',
+            'top-left', 'top-right', 'bottom-right', 'bottom-left'
           ]}
           boundBoxFunc={(oldBox, newBox) => {
             if (newBox.width < 40 || newBox.height < 20) return oldBox;

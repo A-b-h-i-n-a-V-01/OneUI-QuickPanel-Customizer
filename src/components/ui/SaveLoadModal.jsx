@@ -1,18 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Save, Upload, Trash2, X, Clock } from 'lucide-react';
-import { type SavedCalibration } from '../../types';
 
-interface SaveLoadModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSave: (label?: string) => boolean;
-  onLoad: () => SavedCalibration | null;
-  onApply: (saved: SavedCalibration) => void;
-  onDelete: () => void;
-}
 
-export const SaveLoadModal: React.FC<SaveLoadModalProps> = ({
+
+
+export const SaveLoadModal = ({
   isOpen,
   onClose,
   onSave,
@@ -21,8 +14,8 @@ export const SaveLoadModal: React.FC<SaveLoadModalProps> = ({
   onDelete,
 }) => {
   const [label, setLabel] = useState('');
-  const [saveMsg, setSaveMsg] = useState<string | null>(null);
-  const [tab, setTab] = useState<'save' | 'load'>('save');
+  const [saveMsg, setSaveMsg] = useState(null);
+  const [tab, setTab] = useState('save');
 
   const saved = onLoad();
 
@@ -75,7 +68,7 @@ export const SaveLoadModal: React.FC<SaveLoadModalProps> = ({
 
             {/* Tabs */}
             <div className="flex gap-2 mb-5 p-1 bg-white/5 rounded-xl">
-              {(['save', 'load'] as const).map((t) => (
+              {(['save', 'load']).map((t) => (
                 <button
                   key={t}
                   onClick={() => setTab(t)}

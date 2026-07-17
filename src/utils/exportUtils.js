@@ -1,8 +1,8 @@
-import type Konva from 'konva';
-import { type PanelType, type PanelRect, PANEL_META } from '../types';
+
+import { PANEL_META } from '../types';
 
 /**
- * Export individual panel regions as PNG files.
+ * Export individual panel regions files.
  *
  * TODO: In a future version, integrate with Samsung One UI Good Lock
  * or the One UI customization API to directly import these PNGs.
@@ -10,11 +10,11 @@ import { type PanelType, type PanelRect, PANEL_META } from '../types';
  * For now this generates cropped PNGs from the Konva stage via toDataURL.
  */
 export async function exportPanelPNGs(
-  stage: Konva.Stage,
-  panelRects: Partial<Record<PanelType, PanelRect>>,
-  enabledPanels: PanelType[],
-  stageScale: number
-): Promise<void> {
+  stage,
+  panelRects,
+  enabledPanels,
+  stageScale
+) {
   for (const panelId of enabledPanels) {
     const rect = panelRects[panelId];
     if (!rect) continue;
@@ -37,8 +37,8 @@ export async function exportPanelPNGs(
   }
 }
 
-function getPanelFileName(id: PanelType): string {
-  const names: Record<PanelType, string> = {
+function getPanelFileName(id) {
+  const names = {
     buttons: 'ButtonPanel.png',
     brightness: 'Brightness.png',
     volume: 'Volume.png',
@@ -47,7 +47,7 @@ function getPanelFileName(id: PanelType): string {
   return names[id];
 }
 
-function downloadDataUrl(dataUrl: string, filename: string): void {
+function downloadDataUrl(dataUrl, filename) {
   const link = document.createElement('a');
   link.download = filename;
   link.href = dataUrl;
@@ -58,10 +58,10 @@ function downloadDataUrl(dataUrl: string, filename: string): void {
 
 /** Generate a preview data URL for a single panel (used in the ExportPanel UI) */
 export function getPanelPreviewUrl(
-  stage: Konva.Stage,
-  rect: PanelRect,
-  stageScale: number
-): string {
+  stage,
+  rect,
+  stageScale
+) {
   // TODO: Add wallpaper composite rendering per panel
   return stage.toDataURL({
     x: rect.x * stageScale,
@@ -74,6 +74,6 @@ export function getPanelPreviewUrl(
 }
 
 /** Human-readable labels for export panel */
-export function getPanelLabel(id: PanelType): string {
+export function getPanelLabel(id) {
   return PANEL_META[id].label;
 }

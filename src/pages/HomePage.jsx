@@ -1,23 +1,19 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles, Sliders, Image, Download, Save } from 'lucide-react';
-import { type AppPage } from '../types';
 
-interface HomePageProps {
-  hasSavedCalibration: boolean;
-  onStart: () => void;
-  onResume: (page: AppPage) => void;
-}
+
+
 
 const FEATURE_LIST = [
-  { icon: <Image size={18} />, title: 'Upload Your Screenshot', desc: 'Drop in your Samsung Quick Panel screenshot to use as a guide.' },
+  { icon: <Image size={18} />, title: 'Upload Your Screenshot', desc: 'Drop in your Samsung Quick Panel screenshot to use guide.' },
   { icon: <Sliders size={18} />, title: 'Manual Calibration', desc: 'Drag and resize translucent overlays to match each panel region exactly.' },
   { icon: <Sparkles size={18} />, title: 'Wallpaper Editor', desc: 'Position, zoom, rotate, and apply filters to your background image live.' },
   { icon: <Download size={18} />, title: 'Export PNGs', desc: 'Download individual PNG files per panel ready for Samsung One UI.' },
   { icon: <Save size={18} />, title: 'Save Calibration', desc: 'Store your calibration in the browser and skip recalibration next time.' },
 ];
 
-export const HomePage: React.FC<HomePageProps> = ({ hasSavedCalibration, onStart, onResume }) => {
+export const HomePage = ({ hasSavedCalibration, onStart, onResume }) => {
   return (
     <div className="flex-1 flex flex-col items-center justify-start pt-12 pb-16 px-6 max-w-3xl mx-auto w-full">
       {/* Hero */}

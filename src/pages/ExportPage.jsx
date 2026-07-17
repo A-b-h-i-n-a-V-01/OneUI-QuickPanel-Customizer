@@ -2,22 +2,13 @@ import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, PartyPopper } from 'lucide-react';
 import { ExportPanel } from '../components/export/ExportPanel';
-import { WallpaperCanvas, type WallpaperCanvasRef } from '../components/editor/WallpaperCanvas';
+import { WallpaperCanvas } from '../components/editor/WallpaperCanvas';
 import { PhoneMockup } from '../components/phone/PhoneMockup';
-import { type WallpaperTransform, type WallpaperFilters, type PanelType, type PanelRect } from '../types';
 
-interface ExportPageProps {
-  wallpaperUrl: string;
-  screenshotSize: { width: number; height: number };
-  transform: WallpaperTransform;
-  filters: WallpaperFilters;
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  enabledPanels: PanelType[];
-  onBack: () => void;
-  onStartOver: () => void;
-}
 
-export const ExportPage: React.FC<ExportPageProps> = ({
+
+
+export const ExportPage = ({
   wallpaperUrl,
   screenshotSize,
   transform,
@@ -27,7 +18,7 @@ export const ExportPage: React.FC<ExportPageProps> = ({
   onBack,
   onStartOver,
 }) => {
-  const canvasRef = useRef<WallpaperCanvasRef>(null);
+  const canvasRef = useRef(null);
   const PHONE_WIDTH = 220;
 
   const stageScale = Math.min(
@@ -67,10 +58,12 @@ export const ExportPage: React.FC<ExportPageProps> = ({
             transform={transform}
             filters={filters}
             panelRects={panelRects}
+            enabledPanels={enabledPanels}
             showPanelOutlines={false}
             containerWidth={PHONE_WIDTH - 28}
             containerHeight={Math.round((PHONE_WIDTH - 28) * (screenshotSize.height / screenshotSize.width))}
             onTransformChange={() => {}}
+            previewMode={true}
           />
         </div>
 
@@ -85,10 +78,12 @@ export const ExportPage: React.FC<ExportPageProps> = ({
               transform={transform}
               filters={filters}
               panelRects={panelRects}
+              enabledPanels={enabledPanels}
               showPanelOutlines={true}
               containerWidth={PHONE_WIDTH - 28}
               containerHeight={Math.round((PHONE_WIDTH - 28) * (screenshotSize.height / screenshotSize.width))}
               onTransformChange={() => {}}
+              previewMode={true}
             />
           </PhoneMockup>
         </div>
@@ -98,7 +93,7 @@ export const ExportPage: React.FC<ExportPageProps> = ({
           <ExportPanel
             enabledPanels={enabledPanels}
             panelRects={panelRects}
-            stageRef={canvasRef as any}
+            stageRef={canvasRef}
             stageScale={stageScale}
           />
         </div>

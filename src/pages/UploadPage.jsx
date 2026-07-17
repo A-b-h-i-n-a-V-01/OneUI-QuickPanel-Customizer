@@ -4,15 +4,9 @@ import { ArrowRight, ArrowLeft, Smartphone } from 'lucide-react';
 import { DropzoneCard } from '../components/ui/DropzoneCard';
 import { PhoneMockup } from '../components/phone/PhoneMockup';
 
-interface UploadPageProps {
-  screenshotUrl: string | null;
-  onFileSelect: (file: File) => void;
-  onClear: () => void;
-  onNext: () => void;
-  onBack: () => void;
-}
 
-export const UploadPage: React.FC<UploadPageProps> = ({
+
+export const UploadPage = ({
   screenshotUrl,
   onFileSelect,
   onClear,
@@ -27,7 +21,7 @@ export const UploadPage: React.FC<UploadPageProps> = ({
         <h2 className="text-2xl font-black text-white">Upload Your Quick Panel Screenshot</h2>
         <p className="text-gray-400 text-sm mt-1">
           Take a full screenshot of your expanded Samsung Quick Panel and upload it here.
-          It will be used as an alignment guide during calibration.
+          It will be used alignment guide during calibration.
         </p>
       </motion.div>
 

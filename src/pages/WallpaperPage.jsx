@@ -4,15 +4,9 @@ import { ArrowRight, ArrowLeft, Image } from 'lucide-react';
 import { DropzoneCard } from '../components/ui/DropzoneCard';
 import { PhoneMockup } from '../components/phone/PhoneMockup';
 
-interface WallpaperPageProps {
-  wallpaperUrl: string | null;
-  onFileSelect: (file: File) => void;
-  onClear: () => void;
-  onNext: () => void;
-  onBack: () => void;
-}
 
-export const WallpaperPage: React.FC<WallpaperPageProps> = ({
+
+export const WallpaperPage = ({
   wallpaperUrl,
   onFileSelect,
   onClear,

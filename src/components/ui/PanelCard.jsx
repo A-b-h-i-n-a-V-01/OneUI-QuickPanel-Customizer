@@ -1,14 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { type PanelType, type PanelMeta } from '../../types';
 
-interface PanelCardProps {
-  meta: PanelMeta;
-  enabled: boolean;
-  onToggle: (id: PanelType) => void;
-}
 
-export const PanelCard: React.FC<PanelCardProps> = ({ meta, enabled, onToggle }) => {
+
+
+export const PanelCard = ({ meta, enabled, onToggle }) => {
   return (
     <motion.button
       whileHover={{ scale: 1.02 }}

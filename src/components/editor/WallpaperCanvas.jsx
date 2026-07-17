@@ -1,30 +1,8 @@
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { Stage, Layer, Image as KonvaImage, Rect } from 'react-konva';
-import { type WallpaperTransform, type WallpaperFilters, type PanelRect, type PanelType } from '../../types';
+import { Stage, Layer, Image as KonvaImage, Rect, Group } from 'react-konva';
+import Konva from 'konva';
 
-interface WallpaperCanvasProps {
-  wallpaperUrl: string | null;
-  screenshotUrl: string | null;
-  screenshotSize: { width: number; height: number };
-  screenshotOpacity: number;
-  transform: WallpaperTransform;
-  filters: WallpaperFilters;
-  panelRects: Partial<Record<PanelType, PanelRect>>;
-  showPanelOutlines?: boolean;
-  containerWidth: number;
-  containerHeight: number;
-  onTransformChange: (t: WallpaperTransform) => void;
-  previewMode?: boolean; // clip wallpaper to panel rects only
-}
-
-export interface WallpaperCanvasRef {
-  center: () => void;
-  reset: () => void;
-  exportImage: () => string | null;
-  getStage: () => any;
-}
-
-export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasProps>(
+export const WallpaperCanvas = forwardRef(
   (
     {
       wallpaperUrl,
@@ -34,6 +12,7 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
       transform,
       filters,
       panelRects,
+      enabledPanels,
       showPanelOutlines = false,
       containerWidth,
       containerHeight,
@@ -42,9 +21,25 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
     },
     ref
   ) => {
-    const stageRef = useRef<any>(null);
-    const [wallpaperImg, setWallpaperImg] = useState<HTMLImageElement | null>(null);
-    const [screenshotImg, setScreenshotImg] = useState<HTMLImageElement | null>(null);
+    const stageRef = useRef(null);
+    const imageRef1 = useRef(null);
+    const imageRef2 = useRef(null);
+    const [wallpaperImg, setWallpaperImg] = useState(null);
+    const [screenshotImg, setScreenshotImg] = useState(null);
+
+    // Apply caching for Konva filters (required for Blur)
+    useEffect(() => {
+      const imgNode = imageRef1.current || imageRef2.current;
+      if (imgNode) {
+        if (filters.blur > 0) {
+          // Cache the node to apply Konva filters
+          imgNode.cache();
+        } else {
+          imgNode.clearCache();
+        }
+        imgNode.getLayer()?.batchDraw();
+      }
+    }, [filters.blur, wallpaperImg]);
 
     const stageScale = Math.min(
       containerWidth / screenshotSize.width,
@@ -78,7 +73,7 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
       return () => { img.onload = null; };
     }, [screenshotUrl]);
 
-    const autoFit = useCallback((img: HTMLImageElement) => {
+    const autoFit = useCallback((img) => {
       const scaleX = screenshotSize.width / img.width;
       const scaleY = screenshotSize.height / img.height;
       const scale = Math.max(scaleX, scaleY);
@@ -103,7 +98,7 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
     }));
 
     // ── Wheel zoom ─────────────────────────────────────────────────────────────
-    const handleWheel = (e: any) => {
+    const handleWheel = (e) => {
       e.evt.preventDefault();
       if (!wallpaperImg) return;
       const pointer = stageRef.current.getPointerPosition();
@@ -131,9 +126,22 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
 
     // ── Touch pinch ────────────────────────────────────────────────────────────
     const lastDist = useRef(0);
-    const lastCenter = useRef<{ x: number; y: number } | null>(null);
+    const lastCenter = useRef(null);
 
-    const handleTouchMove = (e: any) => {
+    const handleTouchStart = (e) => {
+      if (!wallpaperImg) return;
+      const t1 = e.evt.touches[0];
+      const t2 = e.evt.touches[1];
+      if (t1 && t2) {
+        const rect = stageRef.current.container().getBoundingClientRect();
+        const p1 = { x: t1.clientX - rect.left, y: t1.clientY - rect.top };
+        const p2 = { x: t2.clientX - rect.left, y: t2.clientY - rect.top };
+        lastDist.current = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+        lastCenter.current = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+      }
+    };
+
+    const handleTouchMove = (e) => {
       if (!wallpaperImg) return;
       const t1 = e.evt.touches[0];
       const t2 = e.evt.touches[1];
@@ -173,7 +181,7 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
     };
 
     // Panel outline colors for display
-    const OUTLINE_COLORS: Record<string, string> = {
+    const OUTLINE_COLORS = {
       buttons: '#4F8CFF', brightness: '#FACC15', volume: '#34C97A', media: '#C084FC',
     };
 
@@ -195,6 +203,7 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
           scaleX={stageScale}
           scaleY={stageScale}
           onWheel={handleWheel}
+          onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
           style={{ display: 'block', margin: 'auto' }}
@@ -205,7 +214,8 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
               previewMode ? (
                 <Group
                   clipFunc={(ctx) => {
-                    Object.values(panelRects).forEach((rect) => {
+                    enabledPanels.forEach((panelId) => {
+                      const rect = panelRects[panelId];
                       if (!rect) return;
                       ctx.roundRect
                         ? ctx.roundRect(rect.x, rect.y, rect.width, rect.height, rect.cornerRadius)
@@ -214,6 +224,7 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
                   }}
                 >
                   <KonvaImage
+                    ref={imageRef1}
                     image={wallpaperImg}
                     x={transform.x}
                     y={transform.y}
@@ -227,11 +238,13 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
                     onDragEnd={(e) =>
                       onTransformChange({ ...transform, x: e.target.x(), y: e.target.y() })
                     }
-                    filters={[]}
+                    filters={filters.blur > 0 ? [Konva.Filters.Blur] : []}
+                    blurRadius={filters.blur}
                   />
                 </Group>
               ) : (
                 <KonvaImage
+                  ref={imageRef2}
                   image={wallpaperImg}
                   x={transform.x}
                   y={transform.y}
@@ -245,7 +258,8 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
                   onDragEnd={(e) =>
                     onTransformChange({ ...transform, x: e.target.x(), y: e.target.y() })
                   }
-                  filters={[]}
+                  filters={filters.blur > 0 ? [Konva.Filters.Blur] : []}
+                  blurRadius={filters.blur}
                 />
               )
             )}
@@ -269,7 +283,8 @@ export const WallpaperCanvas = forwardRef<WallpaperCanvasRef, WallpaperCanvasPro
           {/* Panel outline indicators */}
           {showPanelOutlines && (
             <Layer>
-              {Object.values(panelRects).map((rect) => {
+              {enabledPanels.map((panelId) => {
+                const rect = panelRects[panelId];
                 if (!rect) return null;
                 return (
                   <Rect

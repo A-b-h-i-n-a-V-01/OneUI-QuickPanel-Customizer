@@ -2,17 +2,12 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight, ArrowLeft } from 'lucide-react';
 import { PanelCard } from '../components/ui/PanelCard';
-import { type PanelType, PANEL_META } from '../types';
+import { PANEL_META } from '../types';
 import { orderedEnabledPanels, PANEL_ORDER } from '../utils/calibrationUtils';
 
-interface PanelSelectPageProps {
-  enabledPanels: PanelType[];
-  onToggle: (id: PanelType) => void;
-  onNext: () => void;
-  onBack: () => void;
-}
 
-export const PanelSelectPage: React.FC<PanelSelectPageProps> = ({
+
+export const PanelSelectPage = ({
   enabledPanels,
   onToggle,
   onNext,
@@ -39,7 +34,7 @@ export const PanelSelectPage: React.FC<PanelSelectPageProps> = ({
         transition={{ delay: 0.1 }}
         className="flex flex-col gap-3"
       >
-        {PANEL_ORDER.map((id: PanelType, i: number) => (
+        {PANEL_ORDER.map((id, i) => (
           <motion.div
             key={id}
             initial={{ opacity: 0, x: -16 }}

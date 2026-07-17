@@ -1,5 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Menu } from 'lucide-react';
 import { useAppState } from './hooks/useAppState';
 import { useCalibration } from './hooks/useCalibration';
 import { useWallpaper } from './hooks/useWallpaper';
@@ -12,18 +13,42 @@ import { WallpaperPage } from './pages/WallpaperPage';
 import { EditorPage } from './pages/EditorPage';
 import { PreviewPage } from './pages/PreviewPage';
 import { ExportPage } from './pages/ExportPage';
-import { type AppPage, PAGE_ORDER } from './types';
+import { PAGE_ORDER } from './types';
 
 function App() {
   const { currentPage, navigateTo, goPrev } = useAppState();
   const cal = useCalibration();
   const wp = useWallpaper();
 
-  // Track which pages have been visited (for sidebar "completed" styling)
-  const [visited, setVisited] = useState<Set<AppPage>>(new Set(['home']));
+  // Track mobile sidebar drawer open state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const navigate = useCallback((page: AppPage) => {
-    setVisited((prev) => new Set(prev).add(page));
+  // Compute completed pages dynamically based on active state data
+  const completedPages = useMemo(() => {
+    const pages = new Set(['home']);
+    if (cal.state.screenshotUrl) {
+      pages.add('upload');
+    }
+    if (cal.state.enabledPanels.length > 0) {
+      pages.add('panel-select');
+    }
+    const allCalibrated = cal.state.enabledPanels.length > 0 && cal.state.enabledPanels.every(id => cal.state.panelRects[id]);
+    if (cal.state.screenshotUrl && allCalibrated) {
+      pages.add('calibration');
+    }
+    if (wp.state.wallpaperUrl) {
+      pages.add('wallpaper-upload');
+      pages.add('editor');
+    }
+    // Mark preview complete only if we have passed preview stage
+    if (currentPage === 'export') {
+      pages.add('preview');
+    }
+    return pages;
+  }, [cal.state, wp.state, currentPage]);
+
+  const navigate = useCallback((page) => {
+    setSidebarOpen(false); // Close mobile drawer
     navigateTo(page);
   }, [navigateTo]);
 
@@ -40,7 +65,7 @@ function App() {
   }, [goPrev]);
 
   // Screenshot file handler
-  const handleScreenshotSelect = useCallback((file: File) => {
+  const handleScreenshotSelect = useCallback((file) => {
     const url = URL.createObjectURL(file);
     const img = new window.Image();
     img.src = url;
@@ -50,7 +75,7 @@ function App() {
   }, [cal]);
 
   // Wallpaper file handler
-  const handleWallpaperSelect = useCallback((file: File) => {
+  const handleWallpaperSelect = useCallback((file) => {
     const url = URL.createObjectURL(file);
     wp.setWallpaper(url);
     // Auto-advance to editor after wallpaper upload
@@ -62,21 +87,39 @@ function App() {
   }, [navigate]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0F1115]">
+    <div className="flex flex-col lg:flex-row h-screen overflow-hidden bg-[#0F1115]">
+      {/* Mobile Top Header */}
+      <header className="lg:hidden flex items-center justify-between px-5 py-4 border-b border-white/5 bg-[#181A20]/80 backdrop-blur-md z-30">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#4F8CFF] to-[#3770E0] flex items-center justify-center font-black text-white text-xs">
+            UI
+          </div>
+          <span className="text-sm font-bold text-white tracking-tight">DIY OneUI</span>
+        </div>
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="btn-ghost p-2 rounded-xl text-gray-400 hover:text-white"
+        >
+          <Menu size={20} />
+        </button>
+      </header>
+
       {/* Sidebar */}
       <Sidebar
         currentPage={currentPage}
         enabledPanels={cal.state.enabledPanels}
-        completedPages={visited}
+        completedPages={completedPages}
         onNavigate={navigate}
         onSave={cal.saveCalibration}
         onLoad={cal.loadCalibration}
         onApply={cal.applySavedCalibration}
         onDelete={cal.deleteCalibration}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
       />
 
       {/* Main content */}
-      <main className="flex-1 overflow-y-auto flex flex-col">
+      <main className="flex-1 overflow-y-auto flex flex-col min-w-0">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
@@ -84,7 +127,7 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.22 }}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col min-w-0"
           >
             {currentPage === 'home' && (
               <HomePage
