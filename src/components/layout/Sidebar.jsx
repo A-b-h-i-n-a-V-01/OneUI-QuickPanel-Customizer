@@ -11,14 +11,14 @@ import { SaveLoadModal } from '../ui/SaveLoadModal';
 
 
 const PAGE_META = {
-  home:              { label: 'Home',            icon: <Home size={15} />,      short: 'Home' },
-  upload:            { label: 'Upload Screenshot', icon: <Upload size={15} />,   short: 'Screenshot' },
-  'panel-select':    { label: 'Select Panels',   icon: <Layers size={15} />,    short: 'Panels' },
-  calibration:       { label: 'Calibration',     icon: <Sliders size={15} />,   short: 'Calibrate' },
-  'wallpaper-upload':{ label: 'Upload Wallpaper',icon: <Image size={15} />,     short: 'Wallpaper' },
-  editor:            { label: 'Wallpaper Editor',icon: <Sliders size={15} />,   short: 'Editor' },
-  preview:           { label: 'Preview',         icon: <Eye size={15} />,       short: 'Preview' },
-  export:            { label: 'Export PNGs',     icon: <Download size={15} />,  short: 'Export' },
+  home: { label: 'Home', icon: <Home size={15} />, short: 'Home' },
+  upload: { label: 'Upload Screenshot', icon: <Upload size={15} />, short: 'Screenshot' },
+  'panel-select': { label: 'Select Panels', icon: <Layers size={15} />, short: 'Panels' },
+  calibration: { label: 'Calibration', icon: <Sliders size={15} />, short: 'Calibrate' },
+  'wallpaper-upload': { label: 'Upload Wallpaper', icon: <Image size={15} />, short: 'Wallpaper' },
+  editor: { label: 'Wallpaper Editor', icon: <Sliders size={15} />, short: 'Editor' },
+  preview: { label: 'Preview', icon: <Eye size={15} />, short: 'Preview' },
+  export: { label: 'Export PNGs', icon: <Download size={15} />, short: 'Export' },
 };
 
 export const Sidebar = ({
@@ -57,67 +57,67 @@ export const Sidebar = ({
 
       {/* Navigation Steps */}
       <nav className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-1">
-          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider px-2 mb-2">Workflow</p>
-          {PAGE_ORDER.map((page) => {
-            const meta = PAGE_META[page];
-            const isActive = currentPage === page;
-            const isDone = completedPages.has(page);
+        <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider px-2 mb-2">Workflow</p>
+        {PAGE_ORDER.map((page) => {
+          const meta = PAGE_META[page];
+          const isActive = currentPage === page;
+          const isDone = completedPages.has(page);
 
-            return (
-              <button
-                key={page}
-                onClick={() => onNavigate(page)}
-                className={`
+          return (
+            <button
+              key={page}
+              onClick={() => onNavigate(page)}
+              className={`
                   relative flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-left w-full transition-fast
                   ${isActive
-                    ? 'bg-[#4F8CFF]/15 text-white border border-[#4F8CFF]/30'
-                    : isDone
+                  ? 'bg-[#4F8CFF]/15 text-white border border-[#4F8CFF]/30'
+                  : isDone
                     ? 'text-gray-300 hover:bg-white/5 hover:text-white'
                     : 'text-gray-600 hover:text-gray-400 hover:bg-white/3'
-                  }
+                }
                 `}
-              >
-                {/* Status icon */}
-                <span className={isDone ? 'text-[#34C97A]' : isActive ? 'text-[#4F8CFF]' : 'text-gray-700'}>
-                  {isDone ? <CheckCircle size={14} /> : isActive ? meta.icon : <Circle size={14} />}
-                </span>
-                <span className="text-xs font-semibold flex-1 truncate">{meta.label}</span>
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active"
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#4F8CFF] rounded-r"
-                  />
-                )}
-              </button>
-            );
-          })}
-        </nav>
+            >
+              {/* Status icon */}
+              <span className={isDone ? 'text-[#34C97A]' : isActive ? 'text-[#4F8CFF]' : 'text-gray-700'}>
+                {isDone ? <CheckCircle size={14} /> : isActive ? meta.icon : <Circle size={14} />}
+              </span>
+              <span className="text-xs font-semibold flex-1 truncate">{meta.label}</span>
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-[#4F8CFF] rounded-r"
+                />
+              )}
+            </button>
+          );
+        })}
+      </nav>
 
-        {/* Enabled Panels */}
-        {enabledPanels.length > 0 && (
-          <div className="px-4 py-4 border-t border-white/5">
-            <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-3">Enabled Panels</p>
-            <div className="flex flex-col gap-1.5">
-              {enabledPanels.map((id) => (
-                <div key={id} className="flex items-center gap-2">
-                  <Dot size={16} className="text-[#4F8CFF] flex-shrink-0" />
-                  <span className="text-xs text-gray-400">{PANEL_META[id].label}</span>
-                </div>
-              ))}
-            </div>
+      {/* Enabled Panels */}
+      {enabledPanels.length > 0 && (
+        <div className="px-4 py-4 border-t border-white/5">
+          <p className="text-[10px] font-bold text-gray-600 uppercase tracking-wider mb-3">Enabled Panels</p>
+          <div className="flex flex-col gap-1.5">
+            {enabledPanels.map((id) => (
+              <div key={id} className="flex items-center gap-2">
+                <Dot size={16} className="text-[#4F8CFF] flex-shrink-0" />
+                <span className="text-xs text-gray-400">{PANEL_META[id].label}</span>
+              </div>
+            ))}
           </div>
-        )}
-
-        {/* Save button */}
-        <div className="px-3 py-4 border-t border-white/5">
-          <button
-            onClick={() => setSaveModalOpen(true)}
-            className="btn-secondary w-full justify-center text-xs py-2.5"
-          >
-            <Save size={13} /> Save Calibration
-          </button>
         </div>
+      )}
+
+      {/* Save button */}
+      <div className="px-3 py-4 border-t border-white/5">
+        <button
+          onClick={() => setSaveModalOpen(true)}
+          className="btn-secondary w-full justify-center text-xs py-2.5"
+        >
+          <Save size={13} /> Load/Save calibration
+        </button>
       </div>
+    </div>
   );
 
   return (

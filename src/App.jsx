@@ -133,7 +133,13 @@ function App() {
               <HomePage
                 hasSavedCalibration={cal.hasSavedCalibration()}
                 onStart={() => navigate('upload')}
-                onResume={(page) => navigate(page)}
+                onResume={(page) => {
+                  const saved = cal.loadCalibration();
+                  if (saved) {
+                    cal.applySavedCalibration(saved);
+                  }
+                  navigate(page);
+                }}
               />
             )}
 
