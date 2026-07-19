@@ -36,7 +36,7 @@ export const WallpaperCanvas = forwardRef(
       const node = imageNodeRef.current;
       if (!node) return;
       if (filters.blur > 0) {
-        node.cache();
+        node.cache({ pixelRatio: 0.15 });
       } else {
         node.clearCache();
       }
@@ -93,7 +93,26 @@ export const WallpaperCanvas = forwardRef(
         onTransformChange({ ...t, x, y });
       },
       reset: () => { if (wallpaperImg) autoFit(wallpaperImg); },
-      exportImage: () => stageRef.current?.toDataURL({ pixelRatio: 1 / stageScale }) ?? null,
+      exportImage: () => {
+        const node = imageNodeRef.current;
+        const stage = stageRef.current;
+        if (!stage) return null;
+
+        // Temporarily re-cache at high quality for high-res export if blur is active
+        const hasBlur = filters.blur > 0;
+        if (node && hasBlur) {
+          node.cache({ pixelRatio: 1 / stageScale });
+        }
+
+        const dataUrl = stage.toDataURL({ pixelRatio: 1 / stageScale }) ?? null;
+
+        // Restore low-quality preview cache
+        if (node && hasBlur) {
+          node.cache({ pixelRatio: 0.15 });
+        }
+
+        return dataUrl;
+      },
       getStage: () => stageRef.current,
     }));
 
@@ -266,7 +285,7 @@ export const WallpaperCanvas = forwardRef(
     const setImageNodeRef = useCallback((node) => {
       imageNodeRef.current = node;
       if (node && filters.blur > 0) {
-        node.cache();
+        node.cache({ pixelRatio: 0.15 });
         node.getLayer()?.batchDraw();
       }
     // eslint-disable-next-line react-hooks/exhaustive-deps
