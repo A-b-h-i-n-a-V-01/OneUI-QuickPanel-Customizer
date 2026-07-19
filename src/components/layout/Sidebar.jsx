@@ -20,6 +20,24 @@ const GithubIcon = ({ size = 20, ...props }) => (
   </svg>
 );
 
+const LogoIcon = ({ size = 18, ...props }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <rect x="3" y="3" width="18" height="6" rx="1.5" className="opacity-80" />
+    <rect x="3" y="11" width="10" height="10" rx="1.5" />
+    <rect x="15" y="11" width="6" height="10" rx="1.5" className="opacity-60" />
+  </svg>
+);
+
 const PAGE_META = {
   home: { label: 'Home', icon: <Home size={15} />, short: 'Home' },
   upload: { label: 'Upload Screenshot', icon: <Upload size={15} />, short: 'Screenshot' },
@@ -49,10 +67,8 @@ export const Sidebar = ({
     <div className="glass-heavy border-r border-white/5 flex flex-col w-56 h-full flex-shrink-0 min-h-0">
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#4F8CFF] to-[#3770E0] flex items-center justify-center font-black text-white text-sm shadow-lg shadow-[#4F8CFF]/30">
-            UI
-          </div>
+        <div className="flex items-center gap-2.5">
+          <LogoIcon size={22} className="text-[#4F8CFF] flex-shrink-0" />
           <div>
             <p className="text-sm font-black text-white leading-tight">DIY OneUI</p>
             <p className="text-[9px] text-gray-500 font-medium tracking-wide uppercase">Quick Panel Editor</p>

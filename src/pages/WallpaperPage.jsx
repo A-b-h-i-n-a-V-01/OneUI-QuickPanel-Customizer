@@ -48,7 +48,7 @@ export const WallpaperPage = ({
             <ul className="space-y-1 list-disc list-inside">
               <li>Use at least 1080×2400px for Samsung Galaxy S-series</li>
               <li>Portrait orientation works best</li>
-              <li>You can adjust blur, brightness, and more in the editor</li>
+              <li>You can adjust opacity and blur in the editor</li>
               <li>High contrast images tend to look great behind panel regions</li>
             </ul>
           </div>

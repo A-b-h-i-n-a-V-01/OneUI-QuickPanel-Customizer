@@ -20,7 +20,7 @@ export const UploadPage = ({
         <p className="text-[#4F8CFF] text-xs font-bold uppercase tracking-wider mb-1">Step 1</p>
         <h2 className="text-2xl font-black text-white">Upload Your Quick Panel Screenshot</h2>
         <p className="text-gray-400 text-sm mt-1">
-          Take a full screenshot of your expanded Samsung Quick Panel and upload it here.
+          Take a full screenshot of your Samsung Quick Panel and upload it here.
           It will be used alignment guide during calibration.
         </p>
       </motion.div>
@@ -44,9 +44,8 @@ export const UploadPage = ({
 
           {/* Tips */}
           <div className="glass-light rounded-xl p-4 border border-white/5 text-xs text-gray-400 leading-relaxed">
-            <p className="font-bold text-gray-300 mb-1.5">📸 Screenshot Tips</p>
+            <p className="font-bold text-gray-300 mb-1.5">Screenshot Tips</p>
             <ul className="space-y-1 list-disc list-inside">
-              <li>Swipe down twice to fully expand the Quick Panel</li>
               <li>Make sure all your enabled panels are visible</li>
               <li>Use the highest resolution screenshot available</li>
               <li>Avoid cropping — include the full screen height</li>
