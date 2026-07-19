@@ -1,37 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ZoomIn, RotateCw, AlignCenter, RefreshCw,
   Sun, Contrast, Droplets, Eye, Wind,
 } from 'lucide-react';
 
 
-
-
-
-
 const SliderRow = ({
   icon, label, value, min, max, step, display, onChange,
-}) => (
-  <div className="flex flex-col gap-1.5">
-    <div className="flex items-center justify-between">
-      <span className="text-xs text-gray-400 flex items-center gap-1.5 font-medium">
-        {icon} {label}
-      </span>
-      <span className="text-xs font-mono text-[#4F8CFF] font-semibold">
-        {display ?? value.toFixed(2)}
-      </span>
+}) => {
+  const [localVal, setLocalVal] = useState(value);
+
+  // Sync with parent value updates (e.g. reset/center)
+  useEffect(() => {
+    setLocalVal(value);
+  }, [value]);
+
+  // Throttled parent update ref
+  const throttleTimeout = useRef(null);
+
+  const handleInputChange = (val) => {
+    setLocalVal(val);
+
+    // Throttle parent state update to 60ms (approx 16fps)
+    if (!throttleTimeout.current) {
+      onChange(val);
+      throttleTimeout.current = setTimeout(() => {
+        throttleTimeout.current = null;
+      }, 60);
+    }
+  };
+
+  const handleMouseUp = () => {
+    // Sync final exact value on release
+    if (throttleTimeout.current) {
+      clearTimeout(throttleTimeout.current);
+      throttleTimeout.current = null;
+    }
+    onChange(localVal);
+  };
+
+  const formattedDisplay = display ?? (localVal !== undefined && localVal !== null ? localVal.toFixed(2) : '0.00');
+
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between">
+        <span className="text-xs text-gray-400 flex items-center gap-1.5 font-medium">
+          {icon} {label}
+        </span>
+        <span className="text-xs font-mono text-[#4F8CFF] font-semibold">
+          {formattedDisplay}
+        </span>
+      </div>
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={localVal ?? 0}
+        onChange={(e) => handleInputChange(parseFloat(e.target.value))}
+        onMouseUp={handleMouseUp}
+        onTouchEnd={handleMouseUp}
+        className="w-full"
+      />
     </div>
-    <input
-      type="range"
-      min={min}
-      max={max}
-      step={step}
-      value={value}
-      onChange={(e) => onChange(parseFloat(e.target.value))}
-      className="w-full"
-    />
-  </div>
-);
+  );
+};
 
 export const Toolbar = ({
   transform,

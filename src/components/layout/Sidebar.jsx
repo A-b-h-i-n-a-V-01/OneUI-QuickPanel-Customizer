@@ -114,7 +114,7 @@ export const Sidebar = ({
           onClick={() => setSaveModalOpen(true)}
           className="btn-secondary w-full justify-center text-xs py-2.5"
         >
-          <Save size={13} /> Load/Save calibration
+          <Save size={13} /> Save Calibration
         </button>
       </div>
     </div>
