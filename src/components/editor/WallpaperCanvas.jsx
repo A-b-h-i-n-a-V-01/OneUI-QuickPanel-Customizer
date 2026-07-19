@@ -210,7 +210,7 @@ export const WallpaperCanvas = forwardRef(
         isSingleDragging.current = false;
         lastSingleTouch.current = null;
       } else if (pts.length === 1) {
-        // One finger lifted mid-pinch — switch back to single-touch pan
+        // One finger lifted mid-pinch  -  switch back to single-touch pan
         isSingleDragging.current = true;
         lastSingleTouch.current = pts[0];
       }
