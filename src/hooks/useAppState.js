@@ -1,11 +1,24 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { PAGE_ORDER } from '../types';
 
 export function useAppState() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const getPageFromHash = () => {
+    const hash = window.location.hash.replace('#', '');
+    return PAGE_ORDER.includes(hash) ? hash : 'home';
+  };
+
+  const [currentPage, setCurrentPage] = useState(getPageFromHash);
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentPage(getPageFromHash());
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const navigateTo = useCallback((page) => {
-    setCurrentPage(page);
+    window.location.hash = page;
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
 
