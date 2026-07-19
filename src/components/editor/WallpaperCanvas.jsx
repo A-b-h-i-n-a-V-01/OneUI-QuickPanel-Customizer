@@ -113,12 +113,28 @@ export const WallpaperCanvas = forwardRef(
       const nY = pointer.y / stageScale;
       const dx = nX - t.x;
       const dy = nY - t.y;
-      onTransformChange({
+
+      const nextTransform = {
         ...t,
         scale: newScale,
         x: nX - dx * (newScale / oldScale),
         y: nY - dy * (newScale / oldScale),
-      });
+      };
+      transformRef.current = nextTransform;
+
+      const node = imageNodeRef.current;
+      if (node) {
+        node.x(nextTransform.x);
+        node.y(nextTransform.y);
+        node.scaleX(nextTransform.scale);
+        node.scaleY(nextTransform.scale);
+        node.getLayer()?.batchDraw();
+      }
+
+      if (wheelTimeout.current) clearTimeout(wheelTimeout.current);
+      wheelTimeout.current = setTimeout(() => {
+        onTransformChange(transformRef.current);
+      }, 100);
     };
 
     // -- Touch pinch-zoom + pan (all at Stage level) ----------------------------
@@ -126,6 +142,13 @@ export const WallpaperCanvas = forwardRef(
     const lastCenter = useRef(null);
     const lastSingleTouch = useRef(null);
     const isSingleDragging = useRef(false);
+    const wheelTimeout = useRef(null);
+
+    useEffect(() => {
+      return () => {
+        if (wheelTimeout.current) clearTimeout(wheelTimeout.current);
+      };
+    }, []);
 
     const getTouchPoints = (evt) => {
       const rect = stageRef.current.container().getBoundingClientRect();
@@ -177,12 +200,24 @@ export const WallpaperCanvas = forwardRef(
         // Pan delta from pinch-center movement
         const panDX = (center.x - lastCenter.current.x) / stageScale;
         const panDY = (center.y - lastCenter.current.y) / stageScale;
-        onTransformChange({
+        
+        const nextTransform = {
           ...t,
           scale: newScale,
           x: nX - dx * (newScale / oldScale) + panDX,
           y: nY - dy * (newScale / oldScale) + panDY,
-        });
+        };
+        transformRef.current = nextTransform;
+        
+        const node = imageNodeRef.current;
+        if (node) {
+          node.x(nextTransform.x);
+          node.y(nextTransform.y);
+          node.scaleX(nextTransform.scale);
+          node.scaleY(nextTransform.scale);
+          node.getLayer()?.batchDraw();
+        }
+
         lastDist.current = dist;
         lastCenter.current = center;
 
@@ -191,11 +226,20 @@ export const WallpaperCanvas = forwardRef(
         const prev = lastSingleTouch.current;
         if (!prev) { lastSingleTouch.current = pts[0]; return; }
         const t = transformRef.current;
-        onTransformChange({
+        const nextTransform = {
           ...t,
           x: t.x + (pts[0].x - prev.x) / stageScale,
           y: t.y + (pts[0].y - prev.y) / stageScale,
-        });
+        };
+        transformRef.current = nextTransform;
+
+        const node = imageNodeRef.current;
+        if (node) {
+          node.x(nextTransform.x);
+          node.y(nextTransform.y);
+          node.getLayer()?.batchDraw();
+        }
+        
         lastSingleTouch.current = pts[0];
       }
     };
@@ -209,6 +253,8 @@ export const WallpaperCanvas = forwardRef(
       if (pts.length === 0) {
         isSingleDragging.current = false;
         lastSingleTouch.current = null;
+        // Sync final transform back to React state when gesture is fully finished
+        onTransformChange(transformRef.current);
       } else if (pts.length === 1) {
         // One finger lifted mid-pinch  -  switch back to single-touch pan
         isSingleDragging.current = true;
