@@ -342,9 +342,11 @@ export const WallpaperCanvas = forwardRef(
                     enabledPanels.forEach((panelId) => {
                       const rect = panelRects[panelId];
                       if (!rect) return;
-                      ctx.roundRect
-                        ? ctx.roundRect(rect.x, rect.y, rect.width, rect.height, rect.cornerRadius)
-                        : ctx.rect(rect.x, rect.y, rect.width, rect.height);
+                      if (ctx.roundRect) {
+                        ctx.roundRect(rect.x, rect.y, rect.width, rect.height, rect.cornerRadius);
+                      } else {
+                        ctx.rect(rect.x, rect.y, rect.width, rect.height);
+                      }
                     });
                   }}
                 >

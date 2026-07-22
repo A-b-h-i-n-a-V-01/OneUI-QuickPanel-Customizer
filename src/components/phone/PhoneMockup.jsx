@@ -12,16 +12,15 @@ export const PhoneMockup = ({ children, width = 340 }) => {
       className="relative flex-shrink-0"
       style={{ width, height }}
     >
-      {/* Outer phone body */}
       <div
         className="absolute inset-0 glow-blue"
         style={{
-          background: 'linear-gradient(145deg, #1c1f2e 0%, #0d0f17 100%)',
+          background: 'linear-gradient(145deg, #16181f 0%, #090a0f 100%)',
           borderRadius,
-          border: '3px solid #2a2d3e',
+          border: '3px solid #232530',
           boxShadow: `
             0 0 0 1px rgba(255,255,255,0.04),
-            0 24px 64px rgba(0,0,0,0.7),
+            0 24px 64px rgba(0,0,0,0.8),
             inset 0 1px 0 rgba(255,255,255,0.08)
           `,
         }}

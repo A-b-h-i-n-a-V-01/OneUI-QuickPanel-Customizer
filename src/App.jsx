@@ -115,9 +115,9 @@ function App() {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[#0F1115]">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-bg">
       {/* Mobile Top Header */}
-      <header className="md:hidden flex items-center justify-between px-4 py-4 border-b border-white/5 bg-[#181A20]/80 backdrop-blur-md z-30">
+      <header className="md:hidden flex items-center justify-between px-4 py-4 border-b border-white/5 bg-surface/80 backdrop-blur-md z-30">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -126,7 +126,7 @@ function App() {
             <Menu size={20} />
           </button>
           <div className="flex items-center gap-2">
-            <LogoIcon size={18} className="text-[#4F8CFF] flex-shrink-0" />
+            <LogoIcon size={18} className="text-primary flex-shrink-0" />
             <span className="text-sm font-bold text-white tracking-tight">DIY OneUI</span>
           </div>
         </div>

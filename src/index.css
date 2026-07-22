@@ -2,22 +2,22 @@
 
 /* ── Design Tokens ──────────────────────────────────────────────────────────── */
 @theme {
-  --color-bg:       #0F1115;
-  --color-surface:  #181A20;
-  --color-border:   rgba(255,255,255,0.06);
-  --color-primary:  #4F8CFF;
-  --color-primary-dark: #3770E0;
-  --color-success:  #34C97A;
-  --color-warning:  #F59E0B;
+  --color-bg:       #07080a;
+  --color-surface:  #0f1013;
+  --color-border:   rgba(255,255,255,0.08);
+  --color-primary:  #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-success:  #10b981;
+  --color-warning:  #f59e0b;
   --color-text:     #FFFFFF;
-  --color-muted:    #A0AEC0;
-  --color-subtle:   #4A5568;
+  --color-muted:    #9ca3af;
+  --color-subtle:   #374151;
 
-  --radius-sm:   8px;
-  --radius-md:   14px;
-  --radius-lg:   20px;
-  --radius-xl:   28px;
-  --radius-2xl:  40px;
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   24px;
+  --radius-2xl:  32px;
 }
 
 /* ── Base ────────────────────────────────────────────────────────────────────── */
@@ -28,7 +28,7 @@ html {
 }
 
 body {
-  background-color: #0F1115;
+  background-color: #07080a;
   color: #ffffff;
   font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
   margin: 0;
@@ -44,37 +44,37 @@ body {
 
 /* ── Glass Utilities ─────────────────────────────────────────────────────────── */
 .glass {
-  background: rgba(24, 26, 32, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(15, 16, 19, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .glass-heavy {
-  background: rgba(24, 26, 32, 0.85);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(15, 16, 19, 0.9);
+  backdrop-filter: blur(36px);
+  -webkit-backdrop-filter: blur(36px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .glass-light {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 /* ── Glow Effects ────────────────────────────────────────────────────────────── */
 .glow-blue {
-  box-shadow: 0 0 32px rgba(79, 140, 255, 0.18), 0 0 8px rgba(79, 140, 255, 0.08);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
 .glow-blue-sm {
-  box-shadow: 0 0 16px rgba(79, 140, 255, 0.15);
+  box-shadow: 0 4px 20px -6px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
 .glow-blue-hover:hover {
-  box-shadow: 0 0 28px rgba(79, 140, 255, 0.28);
+  box-shadow: 0 15px 45px -8px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.12);
 }
 
 /* ── Transitions ─────────────────────────────────────────────────────────────── */
@@ -92,21 +92,21 @@ body {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.75rem;
-  background: #4F8CFF;
+  background: #2563eb;
   color: #fff;
   font-weight: 700;
   font-size: 0.9375rem;
-  border-radius: 16px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 20px rgba(79, 140, 255, 0.3);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
 }
 
 .btn-primary:hover {
-  background: #3770E0;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(79, 140, 255, 0.4);
+  background: #1d4ed8;
+  transform: translateY(-2.5px);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
 }
 
 .btn-primary:active {

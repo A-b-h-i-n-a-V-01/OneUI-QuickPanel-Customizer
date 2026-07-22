@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
   ZoomIn, RotateCw, AlignCenter, RefreshCw,
-  Sun, Contrast, Droplets, Eye, Wind,
+  Eye, Wind,
 } from 'lucide-react';
+
 
 
 const SliderRow = ({

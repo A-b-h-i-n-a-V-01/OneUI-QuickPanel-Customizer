@@ -140,7 +140,7 @@ export const Sidebar = ({
           onClick={() => setSaveModalOpen(true)}
           className="btn-secondary w-full justify-center text-xs py-2.5"
         >
-          <Save size={13} /> Save Calibration
+          <Save size={13} /> Save/Load Profiles
         </button>
       </div>
 
