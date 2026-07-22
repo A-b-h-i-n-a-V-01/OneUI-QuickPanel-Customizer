@@ -37,7 +37,7 @@ export const DropzoneCard = ({
           </div>
           <button
             onClick={(e) => { e.stopPropagation(); onClear(); }}
-            className="p-1 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-fast"
+            className="p-1 rounded-lg bg-white/5 hover:bg-red-500/20 text-white/70 hover:text-white transition-fast"
             title="Remove"
           >
             <X size={14} />

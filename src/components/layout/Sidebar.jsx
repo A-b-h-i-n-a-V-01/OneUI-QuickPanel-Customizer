@@ -45,8 +45,7 @@ const PAGE_META = {
   calibration: { label: 'Calibration', icon: <Sliders size={15} />, short: 'Calibrate' },
   'wallpaper-upload': { label: 'Upload Wallpaper', icon: <Image size={15} />, short: 'Wallpaper' },
   editor: { label: 'Wallpaper Editor', icon: <Sliders size={15} />, short: 'Editor' },
-  preview: { label: 'Preview', icon: <Eye size={15} />, short: 'Preview' },
-  export: { label: 'Export PNGs', icon: <Download size={15} />, short: 'Export' },
+  export: { label: 'Preview & Export', icon: <Download size={15} />, short: 'Export' },
 };
 
 export const Sidebar = ({
@@ -140,7 +139,7 @@ export const Sidebar = ({
           onClick={() => setSaveModalOpen(true)}
           className="btn-secondary w-full justify-center text-xs py-2.5"
         >
-          <Save size={13} /> Save/Load Profiles
+          <Save size={13} /> Manage Profiles
         </button>
       </div>
 

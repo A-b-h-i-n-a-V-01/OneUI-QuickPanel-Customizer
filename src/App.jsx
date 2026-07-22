@@ -39,7 +39,6 @@ import { PanelSelectPage } from './pages/PanelSelectPage';
 import { CalibrationPage } from './pages/CalibrationPage';
 import { WallpaperPage } from './pages/WallpaperPage';
 import { EditorPage } from './pages/EditorPage';
-import { PreviewPage } from './pages/PreviewPage';
 import { ExportPage } from './pages/ExportPage';
 import { PAGE_ORDER } from './types';
 
@@ -94,6 +93,9 @@ function App() {
 
   // Screenshot file handler
   const handleScreenshotSelect = useCallback((file) => {
+    if (cal.state.screenshotUrl && cal.state.screenshotUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(cal.state.screenshotUrl);
+    }
     const url = URL.createObjectURL(file);
     const img = new window.Image();
     img.src = url;
@@ -104,6 +106,9 @@ function App() {
 
   // Wallpaper file handler
   const handleWallpaperSelect = useCallback((file) => {
+    if (wp.state.wallpaperUrl && wp.state.wallpaperUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(wp.state.wallpaperUrl);
+    }
     const url = URL.createObjectURL(file);
     wp.setWallpaper(url);
     // Auto-advance to editor after wallpaper upload
@@ -250,28 +255,6 @@ function App() {
             {currentPage === 'editor' && !wp.state.wallpaperUrl && (
               <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
                 <p className="text-amber-400 font-semibold">Please upload a wallpaper first.</p>
-                <button onClick={() => navigate('wallpaper-upload')} className="btn-primary">
-                  Upload Wallpaper
-                </button>
-              </div>
-            )}
-
-            {currentPage === 'preview' && wp.state.wallpaperUrl && (
-              <PreviewPage
-                wallpaperUrl={wp.state.wallpaperUrl}
-                screenshotSize={cal.state.screenshotSize}
-                transform={wp.state.transform}
-                filters={wp.state.filters}
-                panelRects={cal.state.panelRects}
-                enabledPanels={cal.state.enabledPanels}
-                onNext={handleNext}
-                onBack={handleBack}
-              />
-            )}
-
-            {currentPage === 'preview' && !wp.state.wallpaperUrl && (
-              <div className="flex-1 flex flex-col items-center justify-center gap-4 p-8">
-                <p className="text-amber-400 font-semibold">No wallpaper loaded.</p>
                 <button onClick={() => navigate('wallpaper-upload')} className="btn-primary">
                   Upload Wallpaper
                 </button>

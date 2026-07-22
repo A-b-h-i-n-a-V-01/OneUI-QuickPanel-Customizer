@@ -161,6 +161,9 @@ export const WallpaperCanvas = forwardRef(
     const lastCenter = useRef(null);
     const lastSingleTouch = useRef(null);
     const isSingleDragging = useRef(false);
+    const isMouseDragging = useRef(false);
+    const lastMousePos = useRef(null);
+    const [isDraggingState, setIsDraggingState] = useState(false);
     const wheelTimeout = useRef(null);
 
     useEffect(() => {
@@ -168,6 +171,46 @@ export const WallpaperCanvas = forwardRef(
         if (wheelTimeout.current) clearTimeout(wheelTimeout.current);
       };
     }, []);
+
+    // -- Desktop Mouse Drag Panning ----------------------------------------------
+    const handleMouseDown = (e) => {
+      if (!wallpaperImg || e.evt.button !== 0) return;
+      isMouseDragging.current = true;
+      setIsDraggingState(true);
+      lastMousePos.current = { x: e.evt.clientX, y: e.evt.clientY };
+    };
+
+    const handleMouseMove = (e) => {
+      if (!isMouseDragging.current || !lastMousePos.current || !wallpaperImg) return;
+      const dx = (e.evt.clientX - lastMousePos.current.x) / stageScale;
+      const dy = (e.evt.clientY - lastMousePos.current.y) / stageScale;
+
+      const t = transformRef.current;
+      const nextTransform = {
+        ...t,
+        x: t.x + dx,
+        y: t.y + dy,
+      };
+      transformRef.current = nextTransform;
+
+      const node = imageNodeRef.current;
+      if (node) {
+        node.x(nextTransform.x);
+        node.y(nextTransform.y);
+        node.getLayer()?.batchDraw();
+      }
+
+      lastMousePos.current = { x: e.evt.clientX, y: e.evt.clientY };
+    };
+
+    const handleMouseUp = () => {
+      if (isMouseDragging.current) {
+        isMouseDragging.current = false;
+        setIsDraggingState(false);
+        lastMousePos.current = null;
+        onTransformChange(transformRef.current);
+      }
+    };
 
     const getTouchPoints = (evt) => {
       const rect = stageRef.current.container().getBoundingClientRect();
@@ -328,10 +371,19 @@ export const WallpaperCanvas = forwardRef(
           scaleX={stageScale}
           scaleY={stageScale}
           onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
-          style={{ display: 'block', margin: 'auto', touchAction: 'none' }}
+          style={{
+            display: 'block',
+            margin: 'auto',
+            touchAction: 'none',
+            cursor: wallpaperImg ? (isDraggingState ? 'grabbing' : 'grab') : 'default',
+          }}
         >
           {/* Wallpaper layer */}
           <Layer>

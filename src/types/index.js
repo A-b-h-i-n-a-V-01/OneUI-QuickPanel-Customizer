@@ -6,7 +6,6 @@ export const PAGE_ORDER = [
   'calibration',
   'wallpaper-upload',
   'editor',
-  'preview',
   'export',
 ];
 

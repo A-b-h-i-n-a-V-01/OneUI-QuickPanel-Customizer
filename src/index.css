@@ -271,3 +271,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
 .animate-pulse-glow {
   animation: pulse-glow 2.5s ease-in-out infinite;
 }
+
+/* ── Touch Target Assurance ─────────────────────────────────────────────────── */
+@media (pointer: coarse) {
+  .btn-primary, .btn-secondary, .btn-ghost, button {
+    min-height: 44px;
+  }
+}

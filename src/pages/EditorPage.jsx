@@ -110,7 +110,7 @@ export const EditorPage = ({
           <ArrowLeft size={15} /> Back
         </button>
         <button onClick={onNext} className="btn-primary">
-          Preview Result <ArrowRight size={16} />
+          Preview & Export <ArrowRight size={16} />
         </button>
       </div>
     </div>
