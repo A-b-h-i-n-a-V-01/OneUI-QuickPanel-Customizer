@@ -1,5 +1,7 @@
 # OneUI QuickPanel Customizer (DIY OneUI)
 
+![OneUI QuickPanel Customizer Preview](oneui.png)
+
 A specialized tool designed to create perfectly aligned wallpapers and custom theme templates for Samsung's OneUI QuickPanel layout. This project was built for personal use to accommodate customization preferences following a new OneUI update, and was vibecoded in a collaborative pair-programming partnership with an AI coding assistant.
 
 ---
